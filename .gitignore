@@ -13,3 +13,7 @@ release-*/
 *.local.*
 documentation.list
 openrepos-description.local.md
+# Rohe Screenshots bleiben draußen (gehen zu OpenRepos, nicht ins Repo);
+# nur die verkleinerten Bilder für die README werden mitgeliefert.
+/screenshots/*
+!/screenshots/readme-*.jpg

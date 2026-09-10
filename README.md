@@ -8,6 +8,12 @@ without root, and says for every value whether a system update will keep it.
 
 <br clear="left">
 
+<p>
+<img src="screenshots/readme-alarm.jpg" width="250" alt="Main page: alarm volume at 40 %, the shipped default beside it, and the verdict that the value survives an update">
+<img src="screenshots/readme-outputs.jpg" width="250" alt="Volume per output: sliders for VoIP, calls and media on the speaker, and every stored value below them">
+<img src="screenshots/readme-steps.jpg" width="250" alt="Volume steps per output, with the note that an update replaces those tables">
+</p>
+
 ## The alarm
 
 Not the ringtone slider, not the volume keys, not switching to Silent. That last
