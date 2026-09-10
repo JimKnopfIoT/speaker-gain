@@ -41,11 +41,26 @@ two.
 Only the output **in use** can be set, because that is how the value is filed:
 the headphones have to be connected to give them one.
 
-On Bluetooth the phone hands its volume to the headphones over AVRCP and holds
-their own control wide open, so everything you hear is set by this value alone.
-A route that has never played before starts from the platform's table —
-25 dB below unity for media, 15 dB for calls. Ten decibels louder for a call
-than for music, on headphones already at maximum.
+### Bluetooth headphones that start too loud
+
+This is the second thing the app is for. On Bluetooth the phone does not turn
+the sound down itself: it hands the figure to the headphones over AVRCP and
+holds **their** own volume control wide open. Everything you hear is therefore
+set by the per-route value alone — and a route that has never played before
+starts from the platform's table, 25 dB below unity for media and 15 dB for
+calls. Ten decibels louder for a call than for music, on headphones already at
+maximum, and picked without knowing anything about the headphones attached.
+
+The fix is one slider:
+
+1. connect the headphones and play something,
+2. open Speaker Gain → **Volume per output**,
+3. lower **Media · Bluetooth, music** to taste.
+
+It stays. The value lives in your home directory, the phone restores it every
+time those headphones come back, and a system update does not touch it. Calls
+have their own value on the same output; set it separately if a call is louder
+than the music, which by default it is.
 
 ## Volume steps, read only
 
