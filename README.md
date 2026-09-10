@@ -43,13 +43,60 @@ the headphones have to be connected to give them one.
 
 ### Bluetooth headphones that start too loud
 
-This is the second thing the app is for. On Bluetooth the phone does not turn
-the sound down itself: it hands the figure to the headphones over AVRCP and
-holds **their** own volume control wide open. Everything you hear is therefore
-set by the per-route value alone — and a route that has never played before
-starts from the platform's table, 25 dB below unity for media and 15 dB for
-calls. Ten decibels louder for a call than for music, on headphones already at
-maximum, and picked without knowing anything about the headphones attached.
+This is the second thing the app is for, and the mechanism behind it is worth
+knowing even if you never touch the slider.
+
+**The phone does not turn Bluetooth sound down. It turns the headphones down —
+and it starts by turning them all the way up.**
+
+Bluetooth carries a remote-control protocol, AVRCP, and part of it is *absolute
+volume*: the phone can tell the headphones which volume to run at, on a scale of
+0 to 127. Sailfish uses it:
+
+```
+module-bluez5-device  path=/org/bluez/hci1/dev_…  avrcp_absolute_volume=1
+```
+
+With that switch on, PulseAudio stops attenuating the audio itself. The sink for
+the headphones reads
+
+```
+bluez_sink…a2dp_sink   Flags: HARDWARE DECIBEL_VOLUME
+                       Volume: 65536 / 100 % / 0.00 dB
+```
+
+and that 100 % is not a description of anything happening on the phone — it is
+the figure being **sent to the headphones**. Their own volume control is now
+wherever the phone put it, which is the top. Whatever you had set on the
+headphones before pairing is gone.
+
+Everything that makes the sound quieter therefore has to happen one layer up, in
+the volume of the audio stream itself. And when an output has never played
+before, there is no stored value for it, so the system takes a fixed figure from
+its own table:
+
+```
+/etc/pulse/x-maemo-route.table
+    sink-input-by-media-role:x-maemo  -25      media
+    sink-input-by-media-role:phone    -15      calls
+    sink-input-by-media-role:voip     -16
+```
+
+Two consequences follow.
+
+The first: that table knows nothing about the headphones attached. A sensitive
+in-ear and an insensitive over-ear get the same −25 dB, against a receiver that
+is wide open. Whether that lands pleasant or painful is luck.
+
+The second: **a call starts ten decibels louder than music**, by that table,
+into headphones at maximum. Ten decibels is not a nuance — it is roughly twice
+as loud.
+
+None of this is a fault in the headphones or in the driver. It is a design
+decision (let the headphones do the attenuating, which is the better place for
+it) plus a fallback figure that had to be picked without knowing what would be
+connected. What is missing is a way to correct that figure once, per pair of
+headphones. That is what this app adds.
 
 The fix is one slider:
 
@@ -59,8 +106,8 @@ The fix is one slider:
 
 It stays. The value lives in your home directory, the phone restores it every
 time those headphones come back, and a system update does not touch it. Calls
-have their own value on the same output; set it separately if a call is louder
-than the music, which by default it is.
+carry their own value on the same output; set it separately, and remember it
+starts ten decibels ahead.
 
 ## Volume steps, read only
 
