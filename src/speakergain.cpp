@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QProcess>
 #include <QProcessEnvironment>
+#include <QSettings>
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QThread>
@@ -787,4 +788,20 @@ bool SpeakerGain::setRoleVolume(const QString &role, int percent)
         m_error = tr("PulseAudio did not accept the volume.");
     emit changed();
     return ok;
+}
+
+bool SpeakerGain::forceEnglish() const
+{
+    QSettings settings;
+    return settings.value(QStringLiteral("forceEnglish"), false).toBool();
+}
+
+void SpeakerGain::setForceEnglish(bool on)
+{
+    QSettings settings;
+    if (settings.value(QStringLiteral("forceEnglish"), false).toBool() == on)
+        return;
+    settings.setValue(QStringLiteral("forceEnglish"), on);
+    settings.sync();
+    emit changed();
 }

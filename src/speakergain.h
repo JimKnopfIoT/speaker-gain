@@ -26,6 +26,10 @@ class SpeakerGain : public QObject
     Q_PROPERTY(int ringVolume READ ringVolume NOTIFY changed)
     Q_PROPERTY(QString currentProfile READ currentProfile NOTIFY changed)
     Q_PROPERTY(QString lastError READ lastError NOTIFY changed)
+    // Show this app in English whatever the phone is set to - for screenshots,
+    // and for anyone who would rather read the original wording. Takes effect
+    // when the app is started again; nothing outside this app is touched.
+    Q_PROPERTY(bool forceEnglish READ forceEnglish WRITE setForceEnglish NOTIFY changed)
 
 public:
     explicit SpeakerGain(QObject *parent = nullptr);
@@ -35,6 +39,8 @@ public:
     int ringVolume() const { return m_ring; }
     QString currentProfile() const { return m_profile; }
     QString lastError() const { return m_error; }
+    bool forceEnglish() const;
+    void setForceEnglish(bool on);
 
     // Re-read everything from profiled.
     Q_INVOKABLE void refresh();

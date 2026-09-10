@@ -30,7 +30,8 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
 # English source strings + German (du-Form).
 CONFIG += sailfishapp_i18n
-TRANSLATIONS += translations/harbour-speakergain-de.ts
+TRANSLATIONS += translations/harbour-speakergain-de.ts \
+                translations/harbour-speakergain-en.ts
 lupdate_only {
     SOURCES += qml/*.qml qml/pages/*.qml qml/cover/*.qml
 }

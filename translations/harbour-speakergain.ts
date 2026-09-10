@@ -40,11 +40,26 @@
     </message>
     <message>
         <location filename="../qml/pages/AboutPage.qml" line="56"/>
+        <source>Language</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="65"/>
+        <source>Show this app in English</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="66"/>
+        <source>Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="70"/>
         <source>Licence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="64"/>
+        <location filename="../qml/pages/AboutPage.qml" line="78"/>
         <source>GPL-3.0-or-later. No warranty — but the whole change is one number in your own settings, and the button next to the slider puts the shipped value back.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -293,134 +308,134 @@
 <context>
     <name>SpeakerGain</name>
     <message>
-        <location filename="../src/speakergain.cpp" line="147"/>
-        <location filename="../src/speakergain.cpp" line="178"/>
+        <location filename="../src/speakergain.cpp" line="148"/>
+        <location filename="../src/speakergain.cpp" line="179"/>
         <source>profiled is not answering on the session bus.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="156"/>
+        <location filename="../src/speakergain.cpp" line="157"/>
         <source>profiled refused the value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="201"/>
+        <location filename="../src/speakergain.cpp" line="202"/>
         <source>Written, but reading it back gave a different value.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="254"/>
+        <location filename="../src/speakergain.cpp" line="255"/>
         <source>Survives updates</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="256"/>
+        <location filename="../src/speakergain.cpp" line="257"/>
         <source>The value is in your home directory and belongs to no package. A restart keeps it, and so does a system update.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="266"/>
+        <location filename="../src/speakergain.cpp" line="267"/>
         <source>No package owns this file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="268"/>
+        <location filename="../src/speakergain.cpp" line="269"/>
         <source>Nothing in the package database claims this path, so no update is going to replace it. Whoever put it there is not the package manager.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="283"/>
+        <location filename="../src/speakergain.cpp" line="284"/>
         <source>Kept as configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="285"/>
+        <location filename="../src/speakergain.cpp" line="286"/>
         <source>The file belongs to %1 and is marked as configuration. An update keeps your edit and puts its own version next to it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="289"/>
+        <location filename="../src/speakergain.cpp" line="290"/>
         <source>An update throws this away</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="291"/>
+        <location filename="../src/speakergain.cpp" line="292"/>
         <source>The file belongs to %1 and is not marked as configuration. The next update of that package overwrites it — no backup copy, no notice.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="482"/>
+        <location filename="../src/speakergain.cpp" line="483"/>
         <source>Media</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="484"/>
+        <location filename="../src/speakergain.cpp" line="485"/>
         <source>Calls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="486"/>
+        <location filename="../src/speakergain.cpp" line="487"/>
         <source>VoIP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="493"/>
+        <location filename="../src/speakergain.cpp" line="494"/>
         <source>Speaker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="495"/>
+        <location filename="../src/speakergain.cpp" line="496"/>
         <source>Wired headphones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="497"/>
+        <location filename="../src/speakergain.cpp" line="498"/>
         <source>Wired headset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="499"/>
+        <location filename="../src/speakergain.cpp" line="500"/>
         <source>Bluetooth, music</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="501"/>
+        <location filename="../src/speakergain.cpp" line="502"/>
         <source>Bluetooth, calls</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="503"/>
+        <location filename="../src/speakergain.cpp" line="504"/>
         <source>Line out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="505"/>
+        <location filename="../src/speakergain.cpp" line="506"/>
         <source>USB audio</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="700"/>
+        <location filename="../src/speakergain.cpp" line="701"/>
         <source>PulseAudio could not be reached.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="716"/>
+        <location filename="../src/speakergain.cpp" line="717"/>
         <source>PulseAudio refused the connection: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="728"/>
+        <location filename="../src/speakergain.cpp" line="729"/>
         <source>PulseAudio dropped the connection: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="751"/>
-        <location filename="../src/speakergain.cpp" line="762"/>
+        <location filename="../src/speakergain.cpp" line="752"/>
+        <location filename="../src/speakergain.cpp" line="763"/>
         <source>The stream could not be opened: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="787"/>
+        <location filename="../src/speakergain.cpp" line="788"/>
         <source>PulseAudio did not accept the volume.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -12,3 +12,4 @@ upload/
 release-*/
 *.local.*
 documentation.list
+openrepos-description.local.md
