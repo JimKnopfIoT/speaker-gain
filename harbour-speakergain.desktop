@@ -1,0 +1,16 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-speakergain
+Name=Speaker Gain
+Comment=Set the output volumes the system hides
+Exec=harbour-speakergain
+
+[X-Sailjail]
+# The app talks to profiled over the session bus (com.nokia.profiled) to read
+# and write alert volumes, and it reads the audio policy's own configuration
+# files plus the RPM database to tell the user whether a value survives an
+# update. Inside a sandbox neither the bus name nor those paths are reachable.
+Sandboxing=Disabled
+OrganizationName=io.github.jimknopfiot
+ApplicationName=harbour-speakergain
