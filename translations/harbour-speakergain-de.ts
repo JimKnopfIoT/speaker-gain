@@ -399,28 +399,28 @@
         <translation>USB-Audio</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="693"/>
+        <location filename="../src/speakergain.cpp" line="700"/>
         <source>PulseAudio could not be reached.</source>
         <translation>PulseAudio war nicht erreichbar.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="709"/>
+        <location filename="../src/speakergain.cpp" line="716"/>
         <source>PulseAudio refused the connection: %1</source>
         <translation>PulseAudio hat die Verbindung abgelehnt: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="721"/>
+        <location filename="../src/speakergain.cpp" line="728"/>
         <source>PulseAudio dropped the connection: %1</source>
         <translation>PulseAudio hat die Verbindung fallen lassen: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="744"/>
-        <location filename="../src/speakergain.cpp" line="755"/>
+        <location filename="../src/speakergain.cpp" line="751"/>
+        <location filename="../src/speakergain.cpp" line="762"/>
         <source>The stream could not be opened: %1</source>
         <translation>Der Stream ließ sich nicht öffnen: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="780"/>
+        <location filename="../src/speakergain.cpp" line="787"/>
         <source>PulseAudio did not accept the volume.</source>
         <translation>PulseAudio hat die Lautstärke nicht angenommen.</translation>
     </message>

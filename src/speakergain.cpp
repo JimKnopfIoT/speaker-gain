@@ -510,9 +510,14 @@ QString routeLabel(const QString &route)
 
 QString SpeakerGain::activeRoute() const
 {
-    // Asking PulseAudio which sink is running answers it for the case that
-    // matters — something is playing. With everything idle the port of the
-    // built-in card still says where sound would go.
+    // PulseAudio names the route itself. The droid sink carries it as the
+    // property x-maemo.mode, and that is exactly the name the stream-restore
+    // module files a volume under - "ihf", "hp", "lineout", "bta2dp". Deriving
+    // it from the port instead is guessing, and the guess is wrong across
+    // devices: a wired headphone reports the port output-wired_headphone on
+    // both phones here, but one calls the route "hp" and the other "lineout".
+    // Getting it wrong means either no slider at all or a value written under a
+    // route the device does not use.
     QProcess p;
     useCLocale(p);
     p.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("list") << QStringLiteral("sinks"));
@@ -520,21 +525,18 @@ QString SpeakerGain::activeRoute() const
         return QString();
     const QStringList lines = QString::fromUtf8(p.readAllStandardOutput()).split(QLatin1Char('\n'));
 
-    QString name, port, state, best;
+    QString name, mode, port, state, best;
     auto flush = [&]() {
         if (name.isEmpty())
             return;
-        QString route;
-        if (name.contains(QStringLiteral("bluez")) && name.contains(QStringLiteral("a2dp")))
-            route = QStringLiteral("bta2dp");
-        else if (name.contains(QStringLiteral("bluez")))
-            route = QStringLiteral("btmono");
-        else if (port.contains(QStringLiteral("headphone")))
-            route = QStringLiteral("hp");
-        else if (port.contains(QStringLiteral("headset")))
-            route = QStringLiteral("hs");
-        else if (port.contains(QStringLiteral("speaker")))
-            route = QStringLiteral("ihf");
+        QString route = mode;
+        if (route.isEmpty()) {
+            // A Bluetooth sink is not a droid sink and carries no mode; there
+            // the profile in its own name is what the route is called.
+            if (name.contains(QStringLiteral("bluez")))
+                route = name.contains(QStringLiteral("a2dp"))
+                            ? QStringLiteral("bta2dp") : QStringLiteral("btmono");
+        }
         if (route.isEmpty())
             return;
         if (state == QLatin1String("RUNNING") || best.isEmpty())
@@ -545,13 +547,18 @@ QString SpeakerGain::activeRoute() const
         const QString l = raw.trimmed();
         if (l.startsWith(QStringLiteral("Sink #"))) {
             flush();
-            name.clear(); port.clear(); state.clear();
+            name.clear(); mode.clear(); port.clear(); state.clear();
         } else if (l.startsWith(QStringLiteral("Name:")))
             name = l.mid(5).trimmed();
-        else if (l.startsWith(QStringLiteral("Active Port:")))
-            port = l.mid(12).trimmed();
         else if (l.startsWith(QStringLiteral("State:")))
             state = l.mid(6).trimmed();
+        else if (l.startsWith(QStringLiteral("Active Port:")))
+            port = l.mid(12).trimmed();
+        else if (l.startsWith(QStringLiteral("x-maemo.mode"))) {
+            const int eq = l.indexOf(QLatin1Char('='));
+            if (eq > 0)
+                mode = l.mid(eq + 1).trimmed().remove(QLatin1Char('"'));
+        }
     }
     flush();
     return best;
