@@ -8,7 +8,7 @@ Release:    1
 # Neutral build host so built RPMs carry no real hostname/domain.
 %define _buildhost reproducible-builder
 License:    GPL-3.0-or-later
-URL:        https://github.com/JimKnopfIoT/harbour-speakergain
+URL:        https://github.com/JimKnopfIoT/speaker-gain
 Source0:    %{name}-%{version}.tar.bz2
 Vendor:     harbour-speakergain contributors
 Packager:   harbour-speakergain contributors
@@ -20,6 +20,7 @@ BuildRequires: pkgconfig(Qt5Core)
 BuildRequires: pkgconfig(Qt5DBus)
 BuildRequires: pkgconfig(Qt5Qml)
 BuildRequires: pkgconfig(Qt5Quick)
+BuildRequires: pkgconfig(libpulse)
 BuildRequires: desktop-file-utils
 BuildRequires: qt5-qttools-linguist
 

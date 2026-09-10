@@ -35,6 +35,10 @@ Page {
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
+                text: qsTr("Volume per output")
+                onClicked: pageStack.push(Qt.resolvedUrl("OutputsPage.qml"))
+            }
+            MenuItem {
                 text: qsTr("Volume steps per output")
                 onClicked: pageStack.push(Qt.resolvedUrl("RoutesPage.qml"))
             }

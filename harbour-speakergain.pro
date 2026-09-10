@@ -12,7 +12,7 @@ CONFIG += sailfishapp
 QT += core qml quick dbus
 
 CONFIG += link_pkgconfig
-PKGCONFIG += sailfishapp
+PKGCONFIG += sailfishapp libpulse
 
 isEmpty(VERSION): VERSION = 0.1.0
 isEmpty(RELEASE): RELEASE = 1
@@ -40,6 +40,7 @@ DISTFILES += \
     qml/cover/CoverPage.qml \
     qml/pages/MainPage.qml \
     qml/pages/RoutesPage.qml \
+    qml/pages/OutputsPage.qml \
     qml/pages/AboutPage.qml \
     rpm/harbour-speakergain.spec \
     harbour-speakergain.desktop \

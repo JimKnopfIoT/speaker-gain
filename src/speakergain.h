@@ -57,6 +57,22 @@ public:
     // The alarm's own storage, without the caller having to know the path.
     Q_INVOKABLE QVariantMap alarmStorage() const;
 
+    // The volumes PulseAudio keeps per role and per output route, decoded from
+    // the two databases in the user's own config directory. Keys per entry:
+    // role, route, percent, current (route is the one in use), source.
+    Q_INVOKABLE QVariantList outputVolumes() const;
+
+    // Which route the device is playing on right now: "ihf" (speaker), "hp"
+    // (wired), "bta2dp" (Bluetooth music) or empty when it cannot be told.
+    Q_INVOKABLE QString activeRoute() const;
+
+    // Set the volume of one role for the route in use, the way the platform
+    // stores it itself: open a playback stream carrying that role, set its
+    // volume, let it go. Writes nothing to any file of the system. Blocks for
+    // well under a second; the database behind it is flushed a few seconds
+    // later, so a read-back right afterwards still shows the old value.
+    Q_INVOKABLE bool setRoleVolume(const QString &role, int percent);
+
     // One entry per output route (speaker, wired, A2DP, mono BT, line out)
     // with its volume step tables. Read only — these files belong to a
     // package and an update overwrites them.
