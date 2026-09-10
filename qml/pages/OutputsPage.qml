@@ -29,6 +29,25 @@ Page {
 
     Component.onCompleted: page.reload()
 
+    // The output can change while this page is open or lying behind another
+    // one: headphones are unplugged, a headset disconnects, a cable goes in.
+    // Reading once at open leaves the page offering a route that is no longer
+    // in use, and a slider moved there writes the value under whichever route
+    // the stream actually lands on. So it re-reads whenever it comes forward,
+    // and on a slow beat while it is in front.
+    onStatusChanged: if (status === PageStatus.Active) page.reload()
+
+    Timer {
+        interval: 4000
+        repeat: true
+        running: page.status === PageStatus.Active && Qt.application.active
+        onTriggered: {
+            var now = speakergain.activeRoute()
+            if (now !== page.route)
+                page.reload()
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: col.height + Theme.paddingLarge

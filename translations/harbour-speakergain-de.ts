@@ -171,57 +171,57 @@
         <translation>Der Wert ließ sich nicht setzen.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="37"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="56"/>
         <source>Read again</source>
         <translation>Neu einlesen</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="46"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="65"/>
         <source>Per output</source>
         <translation>Je Ausgang</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="48"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="67"/>
         <source>Playing on: %1</source>
         <translation>Spielt gerade auf: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="49"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="68"/>
         <source>No output could be identified</source>
         <translation>Kein Ausgang erkennbar</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="58"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="77"/>
         <source>Speaker, wired and Bluetooth each carry a volume of their own, per kind of sound. The system stores them in your home directory, one entry per pairing of the two, and restores them when the output changes. Only the output in use can be set here: the value is filed under its name, so the headphones have to be connected to give them one.</source>
         <translation>Lautsprecher, Kabel und Bluetooth haben jeweils eine eigene Lautstärke, und zwar je Art von Ton. Das System legt sie in deinem Benutzerverzeichnis ab, einen Eintrag je Paarung aus beidem, und holt sie beim Wechsel des Ausgangs wieder hervor. Einstellen lässt sich hier nur der Ausgang, der gerade benutzt wird: Der Wert wird unter dessen Namen abgelegt — für den Kopfhörer muss er also verbunden sein.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="61"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="80"/>
         <source>The output in use</source>
         <translation>Der Ausgang, der gerade benutzt wird</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="99"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="118"/>
         <source>On Bluetooth the phone takes over the headphones&apos; own volume control and holds it at full scale, so everything you hear is set by the value above alone. Lowering it is the only way down — and if the headphones have a volume of their own, it stays where the phone put it after disconnecting.</source>
         <translation>Bei Bluetooth übernimmt das Telefon den Lautstärkeregler des Kopfhörers und hält ihn auf Anschlag. Alles, was du hörst, bestimmt damit allein der Wert oben; ihn abzusenken ist der einzige Weg nach unten. Hat der Kopfhörer einen eigenen Regler, bleibt der nach dem Trennen dort stehen, wo das Telefon ihn hingedreht hat.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="103"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="122"/>
         <source>What the headphones themselves decide</source>
         <translation>Was der Kopfhörer selbst entscheidet</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="113"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="132"/>
         <source>Bluetooth headphones carry settings no audio system can reach, because they live in the headphones and not in the phone: the listening modes — noise cancelling and ambient sound — and the charge of their battery. For Sony models there is a client for Sailfish OS, called Lauscher, that speaks their own protocol and offers exactly those. It is worth knowing about here because ambient sound changes how loud the world around you is, which is half of what people mean by too loud. Setting a volume is not among its functions at the time of writing, so the slider above stays the only way to make the music itself quieter.</source>
         <translation>Bluetooth-Kopfhörer tragen Einstellungen, an die kein Audiosystem herankommt, weil sie im Kopfhörer sitzen und nicht im Telefon: die Hörmodi — Geräuschunterdrückung und Umgebungston — und der Ladestand ihres Akkus. Für Sony-Modelle gibt es unter Sailfish OS einen Klienten namens Lauscher, der deren eigenes Protokoll spricht und genau das anbietet. Hier ist er erwähnenswert, weil der Umgebungston bestimmt, wie laut die Welt um dich herum ist — und das ist die Hälfte dessen, was Leute mit „zu laut“ meinen. Eine Lautstärke zu setzen gehört zum jetzigen Zeitpunkt nicht zu seinen Funktionen; der Regler oben bleibt also der einzige Weg, die Musik selbst leiser zu machen.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="116"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="135"/>
         <source>Every stored value</source>
         <translation>Alle gespeicherten Werte</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsPage.qml" line="125"/>
+        <location filename="../qml/pages/OutputsPage.qml" line="144"/>
         <source>in use</source>
         <translation>in Benutzung</translation>
     </message>
@@ -293,134 +293,134 @@
 <context>
     <name>SpeakerGain</name>
     <message>
-        <location filename="../src/speakergain.cpp" line="131"/>
-        <location filename="../src/speakergain.cpp" line="162"/>
+        <location filename="../src/speakergain.cpp" line="147"/>
+        <location filename="../src/speakergain.cpp" line="178"/>
         <source>profiled is not answering on the session bus.</source>
         <translation>profiled antwortet nicht auf dem Sitzungsbus.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="140"/>
+        <location filename="../src/speakergain.cpp" line="156"/>
         <source>profiled refused the value.</source>
         <translation>profiled hat den Wert abgelehnt.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="185"/>
+        <location filename="../src/speakergain.cpp" line="201"/>
         <source>Written, but reading it back gave a different value.</source>
         <translation>Geschrieben, aber beim Gegenlesen kam ein anderer Wert zurück.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="238"/>
+        <location filename="../src/speakergain.cpp" line="254"/>
         <source>Survives updates</source>
         <translation>Bleibt bei Updates erhalten</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="240"/>
+        <location filename="../src/speakergain.cpp" line="256"/>
         <source>The value is in your home directory and belongs to no package. A restart keeps it, and so does a system update.</source>
         <translation>Der Wert liegt in deinem Benutzerverzeichnis und gehört keinem Paket. Ein Neustart lässt ihn stehen, ein Systemupdate ebenso.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="250"/>
+        <location filename="../src/speakergain.cpp" line="266"/>
         <source>No package owns this file</source>
         <translation>Kein Paket besitzt diese Datei</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="252"/>
+        <location filename="../src/speakergain.cpp" line="268"/>
         <source>Nothing in the package database claims this path, so no update is going to replace it. Whoever put it there is not the package manager.</source>
         <translation>Kein Eintrag der Paketdatenbank beansprucht diesen Pfad, also ersetzt ihn auch kein Update. Wer die Datei dort abgelegt hat, war nicht die Paketverwaltung.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="267"/>
+        <location filename="../src/speakergain.cpp" line="283"/>
         <source>Kept as configuration</source>
         <translation>Als Konfiguration erhalten</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="269"/>
+        <location filename="../src/speakergain.cpp" line="285"/>
         <source>The file belongs to %1 and is marked as configuration. An update keeps your edit and puts its own version next to it.</source>
         <translation>Die Datei gehört zu %1 und ist als Konfiguration gekennzeichnet. Ein Update lässt deine Änderung stehen und legt seine eigene Fassung daneben.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="273"/>
+        <location filename="../src/speakergain.cpp" line="289"/>
         <source>An update throws this away</source>
         <translation>Ein Update verwirft das hier</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="275"/>
+        <location filename="../src/speakergain.cpp" line="291"/>
         <source>The file belongs to %1 and is not marked as configuration. The next update of that package overwrites it — no backup copy, no notice.</source>
         <translation>Die Datei gehört zu %1 und ist nicht als Konfiguration gekennzeichnet. Das nächste Update dieses Pakets überschreibt sie — ohne Sicherungskopie, ohne Hinweis.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="466"/>
+        <location filename="../src/speakergain.cpp" line="482"/>
         <source>Media</source>
         <translation>Medien</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="468"/>
+        <location filename="../src/speakergain.cpp" line="484"/>
         <source>Calls</source>
         <translation>Telefonie</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="470"/>
+        <location filename="../src/speakergain.cpp" line="486"/>
         <source>VoIP</source>
         <translation>VoIP</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="477"/>
+        <location filename="../src/speakergain.cpp" line="493"/>
         <source>Speaker</source>
         <translation>Lautsprecher</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="479"/>
+        <location filename="../src/speakergain.cpp" line="495"/>
         <source>Wired headphones</source>
         <translation>Kabelkopfhörer</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="481"/>
+        <location filename="../src/speakergain.cpp" line="497"/>
         <source>Wired headset</source>
         <translation>Kabel-Headset</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="483"/>
+        <location filename="../src/speakergain.cpp" line="499"/>
         <source>Bluetooth, music</source>
         <translation>Bluetooth, Musik</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="485"/>
+        <location filename="../src/speakergain.cpp" line="501"/>
         <source>Bluetooth, calls</source>
         <translation>Bluetooth, Telefonie</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="487"/>
+        <location filename="../src/speakergain.cpp" line="503"/>
         <source>Line out</source>
         <translation>Line-Ausgang</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="489"/>
+        <location filename="../src/speakergain.cpp" line="505"/>
         <source>USB audio</source>
         <translation>USB-Audio</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="676"/>
+        <location filename="../src/speakergain.cpp" line="693"/>
         <source>PulseAudio could not be reached.</source>
         <translation>PulseAudio war nicht erreichbar.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="692"/>
+        <location filename="../src/speakergain.cpp" line="709"/>
         <source>PulseAudio refused the connection: %1</source>
         <translation>PulseAudio hat die Verbindung abgelehnt: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="704"/>
+        <location filename="../src/speakergain.cpp" line="721"/>
         <source>PulseAudio dropped the connection: %1</source>
         <translation>PulseAudio hat die Verbindung fallen lassen: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="727"/>
-        <location filename="../src/speakergain.cpp" line="738"/>
+        <location filename="../src/speakergain.cpp" line="744"/>
+        <location filename="../src/speakergain.cpp" line="755"/>
         <source>The stream could not be opened: %1</source>
         <translation>Der Stream ließ sich nicht öffnen: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="763"/>
+        <location filename="../src/speakergain.cpp" line="780"/>
         <source>PulseAudio did not accept the volume.</source>
         <translation>PulseAudio hat die Lautstärke nicht angenommen.</translation>
     </message>

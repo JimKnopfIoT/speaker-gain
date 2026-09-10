@@ -11,6 +11,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QProcess>
+#include <QProcessEnvironment>
 #include <QRegularExpression>
 #include <QTextStream>
 #include <QThread>
@@ -45,9 +46,24 @@ QString readAll(const QString &path)
 
 // rpm answers unprivileged; it reads /var/lib/rpm. Kept short-lived and
 // bounded so a hung database cannot freeze the page.
+// Output that gets parsed must not depend on the user's language. pactl
+// translates its own field names - on a German device "Sink #0" reads "Ziel #0"
+// and "Active Port:" reads "Aktiver Port:" - and rpm translates "is not owned
+// by any package" just as happily. A parser looking for the English words then
+// finds nothing, and the page shows no output at all: no route, no slider.
+void useCLocale(QProcess &p)
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QStringLiteral("LC_ALL"), QStringLiteral("C"));
+    env.insert(QStringLiteral("LANG"), QStringLiteral("C"));
+    env.remove(QStringLiteral("LANGUAGE"));
+    p.setProcessEnvironment(env);
+}
+
 QString runRpm(const QStringList &args)
 {
     QProcess p;
+    useCLocale(p);
     p.start(QStringLiteral("rpm"), args);
     if (!p.waitForFinished(4000)) {
         p.kill();
@@ -498,6 +514,7 @@ QString SpeakerGain::activeRoute() const
     // matters — something is playing. With everything idle the port of the
     // built-in card still says where sound would go.
     QProcess p;
+    useCLocale(p);
     p.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("list") << QStringLiteral("sinks"));
     if (!p.waitForFinished(2500))
         return QString();
