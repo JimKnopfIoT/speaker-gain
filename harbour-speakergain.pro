@@ -14,7 +14,7 @@ QT += core qml quick dbus
 CONFIG += link_pkgconfig
 PKGCONFIG += sailfishapp libpulse
 
-isEmpty(VERSION): VERSION = 0.1.0
+isEmpty(VERSION): VERSION = 0.2.0
 isEmpty(RELEASE): RELEASE = 1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += APP_RELEASE=\\\"$$RELEASE\\\"
@@ -25,6 +25,11 @@ HEADERS += \
 SOURCES += \
     src/harbour-speakergain.cpp \
     src/speakergain.cpp
+
+# The helper that applies a volume for an output once it comes into use.
+systemd.files = systemd/harbour-speakergain-apply.service
+systemd.path = /usr/lib/systemd/user
+INSTALLS += systemd
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
@@ -39,10 +44,12 @@ lupdate_only {
 DISTFILES += \
     qml/harbour-speakergain.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/MainPage.qml \
-    qml/pages/RoutesPage.qml \
-    qml/pages/OutputsPage.qml \
+    qml/pages/CarouselPage.qml \
+    qml/pages/AlarmView.qml \
+    qml/pages/StepsView.qml \
+    qml/pages/OutputsView.qml \
     qml/pages/AboutPage.qml \
     rpm/harbour-speakergain.spec \
+    systemd/harbour-speakergain-apply.service \
     harbour-speakergain.desktop \
     translations/*.ts

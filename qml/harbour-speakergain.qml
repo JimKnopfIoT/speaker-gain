@@ -4,7 +4,7 @@ import "pages"
 import "cover"
 
 ApplicationWindow {
-    initialPage: Component { MainPage {} }
+    initialPage: Component { CarouselPage {} }
     cover: Component { CoverPage {} }
     allowedOrientations: defaultAllowedOrientations
 }

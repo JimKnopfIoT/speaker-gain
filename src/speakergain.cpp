@@ -15,7 +15,12 @@
 #include <QSettings>
 #include <QRegularExpression>
 #include <QTextStream>
+#include <QSet>
 #include <QThread>
+#include <QTimer>
+#include <QCoreApplication>
+#include <algorithm>
+#include <QtMath>
 
 #include <pulse/pulseaudio.h>
 
@@ -498,46 +503,169 @@ QString routeLabel(const QString &route)
         return SpeakerGain::tr("Wired headset");
     if (route == QLatin1String("bta2dp"))
         return SpeakerGain::tr("Bluetooth, music");
+    if (route == QLatin1String("btmono-hfp"))
+        return SpeakerGain::tr("Bluetooth, calls (HFP)");
+    if (route == QLatin1String("btmono-hsp"))
+        return SpeakerGain::tr("Bluetooth, calls (HSP)");
     if (route.startsWith(QLatin1String("btmono")))
         return SpeakerGain::tr("Bluetooth, calls");
     if (route == QLatin1String("lineout"))
         return SpeakerGain::tr("Line out");
     if (route == QLatin1String("usbaudio"))
         return SpeakerGain::tr("USB audio");
+    // The combined modes: an alert rings on the speaker as well as on the
+    // accessory, so it is heard with the headphones off.
+    if (route.startsWith(QLatin1String("ihfand"))) {
+        const QString rest = route.mid(6);
+        QString other;
+        if (rest == QLatin1String("headset"))
+            other = SpeakerGain::tr("Wired headset");
+        else if (rest == QLatin1String("lineout"))
+            other = SpeakerGain::tr("Line out");
+        else
+            other = routeLabel(rest);
+        return SpeakerGain::tr("Speaker and %1").arg(other);
+    }
     return route;
+}
+
+} // namespace
+
+namespace {
+
+QString runPactl(const QStringList &args, int timeoutMs = 2500)
+{
+    QProcess p;
+    useCLocale(p);
+    p.start(QStringLiteral("pactl"), args);
+    if (!p.waitForFinished(timeoutMs)) {
+        p.kill();
+        p.waitForFinished(500);
+        return QString();
+    }
+    if (p.exitStatus() != QProcess::NormalExit || p.exitCode() != 0)
+        return QString();
+    return QString::fromUtf8(p.readAllStandardOutput());
+}
+
+// "key = "value"" as pactl prints a property.
+QString propValue(const QString &line)
+{
+    const int eq = line.indexOf(QLatin1Char('='));
+    if (eq < 0)
+        return QString();
+    return line.mid(eq + 1).trimmed().remove(QLatin1Char('"'));
+}
+
+// "front-left: 65536 / 100% / 0.00 dB,   front-right: ..." -> mean percent.
+int volumePercent(const QString &line)
+{
+    const QRegularExpression re(QStringLiteral("(\\d+)%"));
+    QRegularExpressionMatchIterator it = re.globalMatch(line);
+    int sum = 0, n = 0;
+    while (it.hasNext()) {
+        sum += it.next().captured(1).toInt();
+        ++n;
+    }
+    return n > 0 ? qRound(double(sum) / n) : -1;
+}
+
+// The audio policy's last routing decision. module-policy-enforcement keeps
+// it in its own properties - policy.sink_route.mode and .hwid - at the moment
+// it broadcasts the mode to the parameter and stream-restore modules, and the
+// route volumes are filed under exactly mode + hwid. This is the one place
+// that is never stale.
+//
+// The x-maemo.mode a sink carries is not that place. The policy writes it to
+// the sink it routes to, and nobody takes it off again: the Jolla Phone (2026)
+// has three droid sinks, and with the speaker playing sink.primary_output still
+// said "hp" from long ago while sink.deep_buffer said "ihf". Reading the sinks
+// put the sliders on wired headphones the phone does not even have a socket
+// for - writing went to the speaker, and the page showed the untouched
+// headphone value back.
+QString policyRoute()
+{
+    const QStringList lines = runPactl(QStringList() << QStringLiteral("list")
+                                                     << QStringLiteral("modules"))
+                                  .split(QLatin1Char('\n'));
+    bool inPolicy = false, seen = false;
+    QString mode, hwid;
+    for (const QString &raw : lines) {
+        const QString l = raw.trimmed();
+        if (l.startsWith(QStringLiteral("Module #"))) {
+            if (inPolicy)
+                break;
+            continue;
+        }
+        if (l.startsWith(QStringLiteral("Name:"))) {
+            inPolicy = l.mid(5).trimmed() == QLatin1String("module-policy-enforcement");
+            continue;
+        }
+        if (!inPolicy)
+            continue;
+        if (l.startsWith(QStringLiteral("policy.sink_route.mode"))) {
+            mode = propValue(l);
+            seen = true;
+        } else if (l.startsWith(QStringLiteral("policy.sink_route.hwid"))) {
+            hwid = propValue(l);
+        }
+    }
+    return seen && !mode.isEmpty() ? mode + hwid : QString();
+}
+
+// The roles that carry a volume per route, with the figure a route starts
+// from before anything is stored for it: /etc/pulse/x-maemo-route.table,
+// "sink-input-by-media-role:x-maemo -25", in decibels.
+QList<QPair<QString, double>> routeRoles()
+{
+    QList<QPair<QString, double>> out;
+    const QString prefix = QStringLiteral("sink-input-by-media-role:");
+    for (const QString &raw : readAll(QStringLiteral("/etc/pulse/x-maemo-route.table"))
+                                  .split(QLatin1Char('\n'))) {
+        const QString l = raw.trimmed();
+        if (!l.startsWith(prefix))
+            continue;
+        const QStringList parts = l.mid(prefix.size()).split(QRegularExpression(QStringLiteral("\\s+")),
+                                                             QString::SkipEmptyParts);
+        if (parts.isEmpty())
+            continue;
+        bool ok = false;
+        const double db = parts.size() > 1 ? parts.at(1).toDouble(&ok) : 0;
+        out.append(qMakePair(parts.first(), ok ? db : 0.0));
+    }
+    if (out.isEmpty()) {
+        // No table: the three roles every Sailfish device routes, at the
+        // platform's own figures.
+        out << qMakePair(QStringLiteral("x-maemo"), -25.0)
+            << qMakePair(QStringLiteral("phone"), -15.0)
+            << qMakePair(QStringLiteral("voip"), -16.0);
+    }
+    return out;
 }
 
 } // namespace
 
 QString SpeakerGain::activeRoute() const
 {
-    // PulseAudio names the route itself. The droid sink carries it as the
-    // property x-maemo.mode, and that is exactly the name the stream-restore
-    // module files a volume under - "ihf", "hp", "lineout", "bta2dp". Deriving
-    // it from the port instead is guessing, and the guess is wrong across
-    // devices: a wired headphone reports the port output-wired_headphone on
-    // both phones here, but one calls the route "hp" and the other "lineout".
-    // Getting it wrong means either no slider at all or a value written under a
-    // route the device does not use.
-    QProcess p;
-    useCLocale(p);
-    p.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("list") << QStringLiteral("sinks"));
-    if (!p.waitForFinished(2500))
-        return QString();
-    const QStringList lines = QString::fromUtf8(p.readAllStandardOutput()).split(QLatin1Char('\n'));
+    const QString fromPolicy = policyRoute();
+    if (!fromPolicy.isEmpty())
+        return fromPolicy;
 
-    QString name, mode, port, state, best;
+    // No policy module answering - not a stock Sailfish audio setup. The sinks
+    // are the next best thing: a running one wins, a droid sink carries the
+    // route as x-maemo.mode, a Bluetooth sink has the profile in its name.
+    const QStringList lines = runPactl(QStringList() << QStringLiteral("list")
+                                                     << QStringLiteral("sinks"))
+                                  .split(QLatin1Char('\n'));
+
+    QString name, mode, state, best;
     auto flush = [&]() {
         if (name.isEmpty())
             return;
         QString route = mode;
-        if (route.isEmpty()) {
-            // A Bluetooth sink is not a droid sink and carries no mode; there
-            // the profile in its own name is what the route is called.
-            if (name.contains(QStringLiteral("bluez")))
-                route = name.contains(QStringLiteral("a2dp"))
-                            ? QStringLiteral("bta2dp") : QStringLiteral("btmono");
-        }
+        if (route.isEmpty() && name.contains(QStringLiteral("bluez")))
+            route = name.contains(QStringLiteral("a2dp"))
+                        ? QStringLiteral("bta2dp") : QStringLiteral("btmono");
         if (route.isEmpty())
             return;
         if (state == QLatin1String("RUNNING") || best.isEmpty())
@@ -548,21 +676,21 @@ QString SpeakerGain::activeRoute() const
         const QString l = raw.trimmed();
         if (l.startsWith(QStringLiteral("Sink #"))) {
             flush();
-            name.clear(); mode.clear(); port.clear(); state.clear();
+            name.clear(); mode.clear(); state.clear();
         } else if (l.startsWith(QStringLiteral("Name:")))
             name = l.mid(5).trimmed();
         else if (l.startsWith(QStringLiteral("State:")))
             state = l.mid(6).trimmed();
-        else if (l.startsWith(QStringLiteral("Active Port:")))
-            port = l.mid(12).trimmed();
-        else if (l.startsWith(QStringLiteral("x-maemo.mode"))) {
-            const int eq = l.indexOf(QLatin1Char('='));
-            if (eq > 0)
-                mode = l.mid(eq + 1).trimmed().remove(QLatin1Char('"'));
-        }
+        else if (l.startsWith(QStringLiteral("x-maemo.mode")))
+            mode = propValue(l);
     }
     flush();
     return best;
+}
+
+QString SpeakerGain::routeName(const QString &route) const
+{
+    return routeLabel(route);
 }
 
 QVariantList SpeakerGain::outputVolumes() const
@@ -574,6 +702,7 @@ QVariantList SpeakerGain::outputVolumes() const
     const QString streamFile = dbPath(QStringLiteral("-stream-volumes.simple"));
 
     const QString prefix = QStringLiteral("sink-input-by-media-role:");
+    QSet<QString> storedHere;
     for (const DbEntry &e : readDb(routeFile)) {
         if (!e.key.startsWith(prefix))
             continue;
@@ -594,8 +723,33 @@ QVariantList SpeakerGain::outputVolumes() const
         m.insert(QStringLiteral("routeLabel"), routeLabel(route));
         m.insert(QStringLiteral("percent"), pc);
         m.insert(QStringLiteral("current"), !cur.isEmpty() && route == cur);
+        m.insert(QStringLiteral("stored"), true);
         m.insert(QStringLiteral("source"), routeFile);
         out.append(m);
+        if (route == cur)
+            storedHere.insert(role);
+    }
+
+    // An output that has never played - USB headphones plugged in for the
+    // first time, a new pair of Bluetooth ones - has no entry yet, and without
+    // one there would be no slider either. It gets one per role anyway, at the
+    // figure the system starts it from; the first write files it.
+    if (!cur.isEmpty()) {
+        for (const auto &r : routeRoles()) {
+            if (storedHere.contains(r.first))
+                continue;
+            QVariantMap m;
+            m.insert(QStringLiteral("role"), r.first);
+            m.insert(QStringLiteral("route"), cur);
+            m.insert(QStringLiteral("roleLabel"), roleLabel(r.first));
+            m.insert(QStringLiteral("routeLabel"), routeLabel(cur));
+            // PulseAudio's software volume is cubic: dB -> 10^(dB/60).
+            m.insert(QStringLiteral("percent"), qPow(10.0, r.second / 60.0) * 100.0);
+            m.insert(QStringLiteral("current"), true);
+            m.insert(QStringLiteral("stored"), false);
+            m.insert(QStringLiteral("source"), routeFile);
+            out.append(m);
+        }
     }
 
     // The named volumes that are not tied to a route — the alert entries and
@@ -614,6 +768,7 @@ QVariantList SpeakerGain::outputVolumes() const
         m.insert(QStringLiteral("routeLabel"), QString());
         m.insert(QStringLiteral("percent"), pc);
         m.insert(QStringLiteral("current"), false);
+        m.insert(QStringLiteral("stored"), true);
         m.insert(QStringLiteral("source"), streamFile);
         out.append(m);
     }
@@ -788,6 +943,363 @@ bool SpeakerGain::setRoleVolume(const QString &role, int percent)
         m_error = tr("PulseAudio did not accept the volume.");
     emit changed();
     return ok;
+}
+
+// ---------------------------------------------------------------------------
+// The output's own volume
+//
+// Beneath the per-route volume, which works on the stream, every sink has a
+// volume of its own. On the droid sinks it stays at 100 % and the platform
+// never touches it. Elsewhere it means something:
+//
+//   Bluetooth   with AVRCP absolute volume the figure is sent to the
+//               headphones and becomes their own volume - 100 % unless
+//               someone lowers it, whatever the headphones were set to before
+//   USB / other a sound card PulseAudio drives directly; its volume is the
+//               card's mixer, which on many headsets starts at full scale
+//
+// No module on the platform stores these, so a value holds while the output
+// stays connected.
+// ---------------------------------------------------------------------------
+QVariantList SpeakerGain::deviceSinks() const
+{
+    QVariantList out;
+    const QStringList lines = runPactl(QStringList() << QStringLiteral("list")
+                                                     << QStringLiteral("sinks"))
+                                  .split(QLatin1Char('\n'));
+    QString name, desc, driver, state, bus;
+    int percent = -1;
+    auto flush = [&]() {
+        if (name.isEmpty() || percent < 0)
+            return;
+        if (driver.contains(QStringLiteral("droid")) || driver.contains(QStringLiteral("null-sink"))
+                || name.startsWith(QStringLiteral("sink.")))
+            return;
+        QString kind = QStringLiteral("other");
+        if (name.startsWith(QStringLiteral("bluez")) || bus == QLatin1String("bluetooth"))
+            kind = QStringLiteral("bluetooth");
+        else if (bus == QLatin1String("usb") || name.contains(QStringLiteral("usb")))
+            kind = QStringLiteral("usb");
+        QVariantMap m;
+        m.insert(QStringLiteral("name"), name);
+        m.insert(QStringLiteral("label"), desc.isEmpty() ? name : desc);
+        m.insert(QStringLiteral("kind"), kind);
+        m.insert(QStringLiteral("percent"), percent);
+        m.insert(QStringLiteral("running"), state == QLatin1String("RUNNING"));
+        out.append(m);
+    };
+    for (const QString &raw : lines) {
+        const QString l = raw.trimmed();
+        if (l.startsWith(QStringLiteral("Sink #"))) {
+            flush();
+            name.clear(); desc.clear(); driver.clear(); state.clear(); bus.clear();
+            percent = -1;
+        } else if (l.startsWith(QStringLiteral("Name:")))
+            name = l.mid(5).trimmed();
+        else if (l.startsWith(QStringLiteral("Description:")))
+            desc = l.mid(12).trimmed();
+        else if (l.startsWith(QStringLiteral("Driver:")))
+            driver = l.mid(7).trimmed();
+        else if (l.startsWith(QStringLiteral("State:")))
+            state = l.mid(6).trimmed();
+        else if (l.startsWith(QStringLiteral("Volume:")) && percent < 0)
+            percent = volumePercent(l);
+        else if (l.startsWith(QStringLiteral("device.bus ")) || l.startsWith(QStringLiteral("device.bus=")))
+            bus = propValue(l);
+    }
+    flush();
+    return out;
+}
+
+bool SpeakerGain::setSinkVolume(const QString &sink, int percent)
+{
+    m_error.clear();
+    percent = qBound(0, percent, 100);
+    QProcess p;
+    useCLocale(p);
+    p.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("set-sink-volume")
+                                                   << sink
+                                                   << QString::number(percent) + QLatin1Char('%'));
+    const bool ran = p.waitForFinished(2500);
+    if (!ran)
+        p.kill();
+    bool ok = ran && p.exitStatus() == QProcess::NormalExit && p.exitCode() == 0;
+
+    // Read back: a Bluetooth sink hands the figure to the headphones, and
+    // some answer with a step of their own.
+    if (ok) {
+        ok = false;
+        for (const QVariant &v : deviceSinks()) {
+            const QVariantMap m = v.toMap();
+            if (m.value(QStringLiteral("name")).toString() == sink) {
+                ok = qAbs(m.value(QStringLiteral("percent")).toInt() - percent) <= 2;
+                if (!ok)
+                    m_error = tr("Set, but the output reports %1 %.")
+                                  .arg(m.value(QStringLiteral("percent")).toInt());
+                break;
+            }
+        }
+        if (!ok && m_error.isEmpty())
+            m_error = tr("The output is gone.");
+    } else {
+        m_error = tr("PulseAudio did not accept the volume.");
+    }
+    emit changed();
+    return ok;
+}
+
+// ---------------------------------------------------------------------------
+// Every route, and values that wait for theirs
+//
+// module-stream-restore-nemo files a route volume only under the route in use
+// (ext_route_entry_write(u, r, u->route)) and reads the others out of a
+// database it holds in memory. Editing the file underneath it is pointless:
+// the next save writes the memory back over it. So a value for a route that is
+// not in use is kept here and applied, through the same stream, the moment
+// that route is - by a helper that waits for it and leaves again.
+// ---------------------------------------------------------------------------
+namespace {
+
+const char *kModesDir = "/var/lib/nemo-pulseaudio-parameters/modes";
+const char *kHelperUnit = "harbour-speakergain-apply.service";
+
+QString pendingKey(const QString &route, const QString &role)
+{
+    return QStringLiteral("pending/") + route + QLatin1Char('/') + role;
+}
+
+int pendingValue(QSettings &s, const QString &route, const QString &role)
+{
+    bool ok = false;
+    const int v = s.value(pendingKey(route, role)).toInt(&ok);
+    return ok ? v : -1;
+}
+
+bool anyPending()
+{
+    QSettings s;
+    s.beginGroup(QStringLiteral("pending"));
+    return !s.allKeys().isEmpty();
+}
+
+void systemctlUser(const QStringList &args)
+{
+    QProcess p;
+    p.start(QStringLiteral("systemctl"), QStringList() << QStringLiteral("--user") << args);
+    if (!p.waitForFinished(5000))
+        p.kill();
+}
+
+// Order on the page: the plain outputs first, the combined modes after them.
+int routeRank(const QString &r)
+{
+    static const QStringList order = QStringList()
+        << QStringLiteral("ihf") << QStringLiteral("hp") << QStringLiteral("hs")
+        << QStringLiteral("lineout") << QStringLiteral("usbaudio")
+        << QStringLiteral("bta2dp") << QStringLiteral("btmono")
+        << QStringLiteral("btmono-hfp") << QStringLiteral("btmono-hsp");
+    const int i = order.indexOf(r);
+    if (i >= 0)
+        return i;
+    return r.startsWith(QLatin1String("ihfand")) ? 200 : 100;
+}
+
+} // namespace
+
+QVariantList SpeakerGain::allRoutes() const
+{
+    const QString cur = activeRoute();
+    const QList<QPair<QString, double>> roles = routeRoles();
+
+    // What is stored, per route and role.
+    QMap<QString, QMap<QString, double>> stored;
+    const QString prefix = QStringLiteral("sink-input-by-media-role:");
+    for (const DbEntry &e : readDb(dbPath(QStringLiteral("-x-maemo-route-volumes.simple")))) {
+        if (!e.key.startsWith(prefix))
+            continue;
+        const QString rest = e.key.mid(prefix.size());
+        const int colon = rest.indexOf(QLatin1Char(':'));
+        if (colon < 0)
+            continue;
+        bool ok = false;
+        const double pc = rawVolume(e.data, &ok);
+        if (ok)
+            stored[rest.mid(colon + 1)][rest.left(colon)] = pc;
+    }
+
+    // Which routes exist: every mode the audio parameters ship a directory
+    // for, every route the database has seen, and the one in use.
+    QStringList names = QDir(QString::fromLatin1(kModesDir))
+                            .entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    for (const QString &r : stored.keys())
+        if (!names.contains(r))
+            names.append(r);
+    if (!cur.isEmpty() && !names.contains(cur))
+        names.append(cur);
+    std::stable_sort(names.begin(), names.end(), [](const QString &a, const QString &b) {
+        const int ra = routeRank(a), rb = routeRank(b);
+        return ra != rb ? ra < rb : a < b;
+    });
+
+    QSettings settings;
+    QVariantList out;
+    for (const QString &route : names) {
+        QVariantList entries;
+        for (const auto &r : roles) {
+            QVariantMap m;
+            m.insert(QStringLiteral("role"), r.first);
+            m.insert(QStringLiteral("roleLabel"), roleLabel(r.first));
+            const bool has = stored.value(route).contains(r.first);
+            m.insert(QStringLiteral("stored"), has);
+            m.insert(QStringLiteral("percent"), has ? stored.value(route).value(r.first)
+                                                    : qPow(10.0, r.second / 60.0) * 100.0);
+            m.insert(QStringLiteral("pending"), pendingValue(settings, route, r.first));
+            entries.append(m);
+        }
+        QVariantMap m;
+        m.insert(QStringLiteral("route"), route);
+        m.insert(QStringLiteral("label"), routeLabel(route));
+        m.insert(QStringLiteral("current"), route == cur);
+        m.insert(QStringLiteral("entries"), entries);
+        out.append(m);
+    }
+    // The route in use on top.
+    std::stable_sort(out.begin(), out.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toMap().value(QStringLiteral("current")).toBool()
+               && !b.toMap().value(QStringLiteral("current")).toBool();
+    });
+    return out;
+}
+
+bool SpeakerGain::setRouteVolume(const QString &route, const QString &role, int percent)
+{
+    percent = qBound(0, percent, 100);
+    if (route == activeRoute()) {
+        const bool ok = setRoleVolume(role, percent);
+        if (ok)
+            clearPending(route, role);
+        return ok;
+    }
+
+    m_error.clear();
+    {
+        QSettings s;
+        s.setValue(pendingKey(route, role), percent);
+        s.sync();
+        if (s.status() != QSettings::NoError) {
+            m_error = tr("The value could not be kept.");
+            emit changed();
+            return false;
+        }
+    }
+    // Enabled so it survives a restart of the phone, started so it is
+    // listening now. It disables itself once nothing is left to do.
+    systemctlUser(QStringList() << QStringLiteral("enable") << QStringLiteral("--now")
+                                << QLatin1String(kHelperUnit));
+    emit changed();
+    return true;
+}
+
+void SpeakerGain::clearPending(const QString &route, const QString &role)
+{
+    QSettings s;
+    s.remove(pendingKey(route, role));
+    s.sync();
+    emit changed();
+}
+
+namespace {
+
+// Listens to PulseAudio's own event stream instead of asking on a timer:
+// a route change rewrites the policy module's properties, and that is posted
+// as a change on the module.
+class ApplyHelper : public QObject
+{
+public:
+    ApplyHelper()
+    {
+        m_debounce.setSingleShot(true);
+        m_debounce.setInterval(600);
+        QObject::connect(&m_debounce, &QTimer::timeout, [this]() { check(); });
+        QObject::connect(&m_sub, &QProcess::readyReadStandardOutput, [this]() {
+            m_sub.readAllStandardOutput();
+            m_debounce.start();
+        });
+        // PulseAudio restarted, or pactl died: listen again a moment later.
+        QObject::connect(&m_sub, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+                         [this](int, QProcess::ExitStatus) {
+            QTimer::singleShot(3000, [this]() { listen(); });
+        });
+    }
+
+    void start()
+    {
+        listen();
+        check();
+    }
+
+private:
+    void listen()
+    {
+        useCLocale(m_sub);
+        m_sub.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("subscribe"));
+    }
+
+    void check()
+    {
+        const QString route = policyRoute();
+        if (!route.isEmpty()) {
+            QSettings s;
+            s.sync();               // the page writes this file, not us
+            s.beginGroup(QStringLiteral("pending/") + route);
+            const QStringList roles = s.childKeys();
+            s.endGroup();
+            for (const QString &role : roles) {
+                bool ok = false;
+                const int v = s.value(pendingKey(route, role)).toInt(&ok);
+                SpeakerGain g;
+                if (!ok || g.setRoleVolume(role, v)) {
+                    s.remove(pendingKey(route, role));
+                    qInfo("speakergain: applied %s on %s: %d %%",
+                          qPrintable(role), qPrintable(route), v);
+                } else {
+                    qWarning("speakergain: %s on %s failed: %s", qPrintable(role),
+                             qPrintable(route), qPrintable(g.lastError()));
+                }
+            }
+            s.sync();
+        }
+        if (!anyPending()) {
+            systemctlUser(QStringList() << QStringLiteral("disable") << QLatin1String(kHelperUnit));
+            // The page may have kept a new value between the look above and
+            // the disable - it found the unit running and left it be. Then
+            // stay, and stay enabled.
+            if (anyPending()) {
+                systemctlUser(QStringList() << QStringLiteral("enable") << QLatin1String(kHelperUnit));
+                return;
+            }
+            qInfo("speakergain: nothing left to apply");
+            m_sub.disconnect();
+            m_sub.kill();
+            m_sub.waitForFinished(1000);
+            QCoreApplication::quit();
+        }
+    }
+
+    QProcess m_sub;
+    QTimer m_debounce;
+};
+
+} // namespace
+
+int SpeakerGain::runApplyHelper(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    QCoreApplication::setOrganizationName(QStringLiteral("harbour-speakergain"));
+    QCoreApplication::setApplicationName(QStringLiteral("harbour-speakergain"));
+    ApplyHelper helper;
+    QTimer::singleShot(0, [&helper]() { helper.start(); });
+    return app.exec();
 }
 
 bool SpeakerGain::forceEnglish() const

@@ -4,9 +4,11 @@ import Sailfish.Silica 1.0
 // Read only, on purpose. These tables decide what one press of the volume key
 // does on each output, and they belong to a package: an update replaces them
 // and takes any edit with it. So the app shows them and says so.
-Page {
+// Left of the alarm in the carousel.
+Item {
     id: page
-    allowedOrientations: Orientation.All
+
+    property bool current: false
 
     property var routes: []
     property var store: ({})
@@ -27,7 +29,14 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: col.height + Theme.paddingLarge
+        contentHeight: col.height + 3 * Theme.paddingLarge
+
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
+            }
+        }
 
         Column {
             id: col

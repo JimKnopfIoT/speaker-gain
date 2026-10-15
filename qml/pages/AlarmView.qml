@@ -4,9 +4,12 @@ import Sailfish.Silica 1.0
 // The one knob that works today: the alarm volume, written into profiled's
 // general profile. Everything else on this page explains why the knob has to
 // exist at all, and whether the value will still be there tomorrow.
-Page {
+// The middle of the carousel in CarouselPage.qml.
+Item {
     id: page
-    allowedOrientations: Orientation.All
+
+    // Set by the carousel while this view is the one in front.
+    property bool current: false
 
     property string statusText: ""
     property bool statusGood: true
@@ -23,24 +26,16 @@ Page {
 
     Component.onCompleted: page.store = speakergain.alarmStorage()
 
-    onStatusChanged: if (status === PageStatus.Activating) speakergain.refresh()
+    onCurrentChanged: if (current) speakergain.refresh()
 
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: col.height + Theme.paddingLarge
+        contentHeight: col.height + 3 * Theme.paddingLarge
 
         PullDownMenu {
             MenuItem {
                 text: qsTr("About")
                 onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Volume per output")
-                onClicked: pageStack.push(Qt.resolvedUrl("OutputsPage.qml"))
-            }
-            MenuItem {
-                text: qsTr("Volume steps per output")
-                onClicked: pageStack.push(Qt.resolvedUrl("RoutesPage.qml"))
             }
         }
 

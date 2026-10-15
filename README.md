@@ -44,8 +44,32 @@ kind of sound — media, calls, VoIP — and the system restores them when the
 output changes. They live in your home directory, one entry per pairing of the
 two.
 
-Only the output **in use** can be set, because that is how the value is filed:
-the headphones have to be connected to give them one.
+Every output the system knows gets its sliders — speaker, wired headphones and
+headset, line out, USB audio, both Bluetooth profiles and the combined modes
+alerts use. The output **in use** takes a value at once. Any other cannot be
+written while it is idle: the stream-restore module keeps that database in
+memory and files a value only under the route in use, so editing the file
+underneath it is undone by its next save. A value for an idle output is
+therefore kept by the app, and a small helper
+(`harbour-speakergain-apply.service`, a systemd user unit) waits on
+PulseAudio's event stream for that output to come into use, applies the value
+the same way and quits. It is enabled only while a value is waiting and
+disables itself afterwards.
+
+Which output is in use comes from the audio policy's own last routing decision
+(`policy.sink_route.mode` on `module-policy-enforcement`), not from the sinks:
+a sink keeps the route name it was last given, and on the Jolla Phone (2026)
+one of three droid sinks still said "wired headphones" while the speaker
+played.
+
+An output that has never played — USB-C headphones on first plug-in, a new
+Bluetooth pair — has no stored value yet. It gets its sliders anyway, at the
+figure the system starts it from, and the first move stores one.
+
+Bluetooth headphones and USB sound cards PulseAudio drives directly also show
+**the output's own volume**: on Bluetooth the figure sent to the headphones
+over AVRCP, on USB the card's mixer. Both start at full scale. The system
+stores neither, so that value holds while the output stays connected.
 
 ### Bluetooth headphones that start too loud
 
@@ -107,7 +131,7 @@ headphones. That is what this app adds.
 The fix is one slider:
 
 1. connect the headphones and play something,
-2. open Speaker Gain → **Volume per output**,
+2. open Speaker Gain and swipe over to **Per output**, right of the alarm,
 3. lower **Media · Bluetooth, music** to taste.
 
 It stays. The value lives in your home directory, the phone restores it every
@@ -171,7 +195,7 @@ mb2 -t SailfishOS-5.0.0.62-aarch64 build
 
 ## Status
 
-0.1.0. The alarm slider is verified on all three devices named above. The
+0.2.0. The alarm slider is verified on all three devices named above. The
 per-output part is verified on the Jolla Phone (2026) and the Xperia 10 III; it
 builds and installs for armv7hl but has not been tried on hardware there.
 

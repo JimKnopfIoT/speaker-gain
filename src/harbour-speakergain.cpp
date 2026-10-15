@@ -22,6 +22,12 @@
 
 int main(int argc, char *argv[])
 {
+    // The helper that applies a waiting volume once its output comes into use
+    // (see SpeakerGain::setRouteVolume). No window, no QML.
+    for (int i = 1; i < argc; ++i)
+        if (qstrcmp(argv[i], "--apply-pending") == 0)
+            return SpeakerGain::runApplyHelper(argc, argv);
+
     // A language for this window only.
     //
     // Screenshots for a listing have to be in English, and the way to get them
@@ -43,6 +49,8 @@ int main(int argc, char *argv[])
     }
 
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    // About shows Qt.application.version; nothing set it before.
+    app->setApplicationVersion(QStringLiteral(APP_VERSION "-" APP_RELEASE));
 
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 

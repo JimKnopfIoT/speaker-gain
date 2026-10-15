@@ -69,8 +69,12 @@ public:
     Q_INVOKABLE QVariantList outputVolumes() const;
 
     // Which route the device is playing on right now: "ihf" (speaker), "hp"
-    // (wired), "bta2dp" (Bluetooth music) or empty when it cannot be told.
+    // (wired), "bta2dp" (Bluetooth music), "usbaudio" and so on, exactly as
+    // the volume database spells it, or empty when it cannot be told.
     Q_INVOKABLE QString activeRoute() const;
+
+    // A route name in words, for headers.
+    Q_INVOKABLE QString routeName(const QString &route) const;
 
     // Set the volume of one role for the route in use, the way the platform
     // stores it itself: open a playback stream carrying that role, set its
@@ -79,10 +83,42 @@ public:
     // later, so a read-back right afterwards still shows the old value.
     Q_INVOKABLE bool setRoleVolume(const QString &role, int percent);
 
+    // Outputs that keep a volume of their own on top of the per-route one:
+    // Bluetooth headphones (the figure is sent to them over AVRCP) and USB or
+    // other sound cards PulseAudio drives directly. The phone's own droid
+    // sinks are left out - their volume is not the place the platform sets
+    // anything. Keys: name, label, kind ("bluetooth" | "usb" | "other"),
+    // percent, running.
+    Q_INVOKABLE QVariantList deviceSinks() const;
+
+    // Set one of those outputs' own volume. Not stored by the system: it holds
+    // while the output stays connected.
+    Q_INVOKABLE bool setSinkVolume(const QString &sink, int percent);
+
     // One entry per output route (speaker, wired, A2DP, mono BT, line out)
     // with its volume step tables. Read only — these files belong to a
     // package and an update overwrites them.
     Q_INVOKABLE QVariantList routes() const;
+
+    // Every output route the system knows - the modes the audio parameters
+    // ship plus whatever the database already holds - with one entry per role
+    // each. Keys per route: route, label, current, entries; per entry: role,
+    // roleLabel, percent, stored, pending (-1 when nothing is waiting).
+    Q_INVOKABLE QVariantList allRoutes() const;
+
+    // Set a role's volume on any route. The route in use takes it at once.
+    // Any other route cannot be written while it is not in use - PulseAudio
+    // keeps that database in memory and only ever files the current route -
+    // so the value waits, and a small helper applies it the moment the route
+    // comes into use and then quits. Returns false only on a real failure.
+    Q_INVOKABLE bool setRouteVolume(const QString &route, const QString &role, int percent);
+
+    // Drop a waiting value.
+    Q_INVOKABLE void clearPending(const QString &route, const QString &role);
+
+    // The helper: "harbour-speakergain --apply-pending". Waits for route
+    // changes, applies what is waiting, quits when nothing is left.
+    static int runApplyHelper(int argc, char *argv[]);
 
 signals:
     void changed();
