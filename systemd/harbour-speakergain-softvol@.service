@@ -1,0 +1,11 @@
+# Speaker Gain: adds a USB device to (or removes it from) the list of those
+# whose volume PulseAudio sets in software, then re-enumerates it so the
+# change takes effect without unplugging. Instance: add-VVVV-PPPP or
+# remove-VVVV-PPPP (USB vendor and product id). Started by the app; the polkit
+# rule lets defaultuser start exactly this unit. Never enabled.
+[Unit]
+Description=Speaker Gain: software volume for USB device %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/harbour-speakergain --softvol %i

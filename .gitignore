@@ -17,3 +17,6 @@ openrepos-description.local.md
 # nur die verkleinerten Bilder für die README werden mitgeliefert.
 /screenshots/*
 !/screenshots/readme-*.jpg
+
+# Material von Nutzern (Screenshots, Probe-Berichte) bleibt lokal.
+/media/

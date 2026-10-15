@@ -52,6 +52,14 @@ Page {
                 font.pixelSize: Theme.fontSizeExtraSmall
                 text: qsTr("One stored number, in your own settings, through the same interface the system uses itself. No root, nothing patched, no file of the system touched. Set it back to the shipped value and nothing of this app is left behind.")
             }
+            Label {
+                x: Theme.horizontalPageMargin
+                width: page.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.secondaryColor
+                text: qsTr("One exception, for USB headphones whose volume control reports a scale the system cannot use: the package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Others are added to that list by a small helper with system rights, and only when you ask for it on the outputs page. Removing the app removes all of it.")
+            }
 
             SectionHeader { text: qsTr("Language") }
 
@@ -65,6 +73,21 @@ Page {
                 text: qsTr("Show this app in English")
                 description: qsTr("Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.")
                 onClicked: speakergain.forceEnglish = !speakergain.forceEnglish
+            }
+
+            SectionHeader { text: qsTr("When something does not work") }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: page.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.Wrap
+                font.pixelSize: Theme.fontSizeExtraSmall
+                text: qsTr("If a slider moves but the sound does not change, a short report of how this phone's sound is put together helps to find out why. It holds no serial numbers, addresses or names, and you see all of it before you pass it on.")
+            }
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: qsTr("Diagnostics")
+                onClicked: pageStack.push(Qt.resolvedUrl("DiagnosticsPage.qml"))
             }
 
             SectionHeader { text: qsTr("Licence") }

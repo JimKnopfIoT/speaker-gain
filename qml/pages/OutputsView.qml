@@ -61,6 +61,27 @@ Item {
         page.sinks = speakergain.deviceSinks()
     }
 
+    // USB headphones whose volume scale PulseAudio cannot use: the root
+    // helper lists them for software volume and plugs them in anew. Takes a
+    // few seconds; the page reads everything again afterwards.
+    function softVolume(usbId, on) {
+        var ok = speakergain.setSoftVolume(usbId, on)
+        page.statusGood = ok
+        page.statusText = ok
+            ? (on ? qsTr("The volume of these headphones is now set in software. They were connected anew for it.")
+                  : qsTr("Back to the device's own volume control. The headphones were connected anew for it."))
+            : (speakergain.lastError.length > 0 ? speakergain.lastError : qsTr("Could not set the value."))
+        softVolumeReload.start()
+    }
+
+    // The re-enumerated device reappears in PulseAudio a moment after the
+    // helper returns.
+    Timer {
+        id: softVolumeReload
+        interval: 2500
+        onTriggered: page.reload()
+    }
+
     Component.onCompleted: page.reload()
 
     // The output can change while this page is open or lying behind another
@@ -205,17 +226,55 @@ Item {
             }
             Repeater {
                 model: page.sinks
-                delegate: Slider {
+                delegate: Column {
                     width: page.width
-                    minimumValue: 0
-                    maximumValue: 100
-                    stepSize: 1
-                    value: modelData.percent
-                    valueText: Math.round(value) + " %"
-                    label: modelData.label
-                           + (modelData.kind === "bluetooth" ? "  ·  " + qsTr("Bluetooth")
-                              : modelData.kind === "usb" ? "  ·  " + qsTr("USB") : "")
-                    onReleased: page.applySink(modelData.name, Math.round(value))
+                    spacing: Theme.paddingSmall
+
+                    // Broken scale and nothing done about it yet.
+                    property bool needsSoft: modelData.scaleBroken === true && modelData.softVolume !== true
+
+                    Slider {
+                        width: page.width
+                        minimumValue: 0
+                        maximumValue: 100
+                        stepSize: 1
+                        value: modelData.percent
+                        valueText: Math.round(value) + " %"
+                        label: modelData.label
+                               + (modelData.kind === "bluetooth" ? "  ·  " + qsTr("Bluetooth")
+                                  : modelData.kind === "usb" ? "  ·  " + qsTr("USB") : "")
+                        onReleased: page.applySink(modelData.name, Math.round(value))
+                    }
+                    Label {
+                        x: Theme.horizontalPageMargin
+                        width: page.width - 2 * Theme.horizontalPageMargin
+                        wrapMode: Text.Wrap
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: Theme.highlightColor
+                        visible: parent.needsSoft
+                        text: qsTr("These headphones report a volume scale the system cannot use: whatever is set, they stay at full volume. Speaker Gain can have the phone set their volume in software instead. They are connected anew for it, which takes a few seconds.")
+                    }
+                    Button {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: parent.needsSoft
+                        text: qsTr("Set volume in software")
+                        onClicked: page.softVolume(modelData.usbId, true)
+                    }
+                    Label {
+                        x: Theme.horizontalPageMargin
+                        width: page.width - 2 * Theme.horizontalPageMargin
+                        wrapMode: Text.Wrap
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: Theme.secondaryColor
+                        visible: modelData.scaleBroken === true && modelData.softVolume === true
+                        text: qsTr("The volume of these headphones is set in software, because their own volume control reports a scale the system cannot use.")
+                    }
+                    Button {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        visible: modelData.softVolumeSource === "local"
+                        text: qsTr("Use the device's own control again")
+                        onClicked: page.softVolume(modelData.usbId, false)
+                    }
                 }
             }
 

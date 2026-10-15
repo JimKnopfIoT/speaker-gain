@@ -1,0 +1,13 @@
+// harbour-speakergain: defaultuser may start the software-volume helper
+// (harbour-speakergain-softvol@<add|remove>-VVVV-PPPP.service), nothing else.
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        subject.user == "defaultuser") {
+        var unit = action.lookup("unit") || "";
+        var verb = action.lookup("verb") || "";
+        if (/^harbour-speakergain-softvol@(add|remove)-[0-9a-f]{4}-[0-9a-f]{4}\.service$/.test(unit) &&
+            verb == "start") {
+            return polkit.Result.YES;
+        }
+    }
+});

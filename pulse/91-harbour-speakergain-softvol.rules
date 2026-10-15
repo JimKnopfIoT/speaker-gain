@@ -1,0 +1,17 @@
+# Speaker Gain: USB headphones known to report a volume scale PulseAudio cannot
+# use. Matched by vendor and product id only. PulseAudio loads them with a
+# profile set that sets the volume in software. Devices the app finds on a
+# phone are added to /etc/udev/rules.d/91-harbour-speakergain-softvol-local.rules
+# by its helper.
+
+SUBSYSTEM!="sound", GOTO="speakergain_softvol_end"
+ACTION!="change", GOTO="speakergain_softvol_end"
+KERNEL!="card*", GOTO="speakergain_softvol_end"
+# No SUBSYSTEMS!="usb" guard here: udev tests a negated parent key against the
+# card itself, whose subsystem is "sound", so it would always jump to the end.
+# The ATTRS below only match a USB parent anyway.
+
+# Bose Noise Cancelling Wired Earbuds: PCM claims -25600..0 dB
+ATTRS{idVendor}=="05a7", ATTRS{idProduct}=="4101", ENV{PULSE_PROFILE_SET}="harbour-speakergain-softvol.conf"
+
+LABEL="speakergain_softvol_end"

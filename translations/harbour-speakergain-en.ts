@@ -39,27 +39,47 @@
         <translation>One stored number, in your own settings, through the same interface the system uses itself. No root, nothing patched, no file of the system touched. Set it back to the shipped value and nothing of this app is left behind.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="56"/>
+        <location filename="../qml/pages/AboutPage.qml" line="61"/>
+        <source>One exception, for USB headphones whose volume control reports a scale the system cannot use: the package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Others are added to that list by a small helper with system rights, and only when you ask for it on the outputs page. Removing the app removes all of it.</source>
+        <translation>One exception, for USB headphones whose volume control reports a scale the system cannot use: the package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Others are added to that list by a small helper with system rights, and only when you ask for it on the outputs page. Removing the app removes all of it.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="64"/>
         <source>Language</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="65"/>
+        <location filename="../qml/pages/AboutPage.qml" line="73"/>
         <source>Show this app in English</source>
         <translation>Show this app in English</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="66"/>
+        <location filename="../qml/pages/AboutPage.qml" line="74"/>
         <source>Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.</source>
         <translation>Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="70"/>
+        <location filename="../qml/pages/AboutPage.qml" line="78"/>
+        <source>When something does not work</source>
+        <translation>When something does not work</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="85"/>
+        <source>If a slider moves but the sound does not change, a short report of how this phone&apos;s sound is put together helps to find out why. It holds no serial numbers, addresses or names, and you see all of it before you pass it on.</source>
+        <translation>If a slider moves but the sound does not change, a short report of how this phone&apos;s sound is put together helps to find out why. It holds no serial numbers, addresses or names, and you see all of it before you pass it on.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="89"/>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="93"/>
         <source>Licence</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="78"/>
+        <location filename="../qml/pages/AboutPage.qml" line="101"/>
         <source>GPL-3.0-or-later. No warranty — but the whole change is one number in your own settings, and the button next to the slider puts the shipped value back.</source>
         <translation>GPL-3.0-or-later. No warranty — but the whole change is one number in your own settings, and the button next to the slider puts the shipped value back.</translation>
     </message>
@@ -164,6 +184,54 @@
     </message>
 </context>
 <context>
+    <name>DiagnosticsPage</name>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="24"/>
+        <source>Save to Documents</source>
+        <translation>Save to Documents</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="27"/>
+        <source>Saved as %1</source>
+        <translation>Saved as %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="28"/>
+        <source>Could not save the report.</source>
+        <translation>Could not save the report.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="32"/>
+        <source>Copy to clipboard</source>
+        <translation>Copy to clipboard</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="35"/>
+        <source>Copied. Paste it into a message or an issue.</source>
+        <translation>Copied. Paste it into a message or an issue.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="39"/>
+        <source>Collect again</source>
+        <translation>Collect again</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="49"/>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="56"/>
+        <source>Plug in the headphones that misbehave and start some music before opening this page, then pull down to copy or save. The report describes how this phone&apos;s sound is wired up and names what looks wrong. It is not sent anywhere: you decide where it goes.</source>
+        <translation>Plug in the headphones that misbehave and start some music before opening this page, then pull down to copy or save. The report describes how this phone&apos;s sound is wired up and names what looks wrong. It is not sent anywhere: you decide where it goes.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/DiagnosticsPage.qml" line="64"/>
+        <source>Left out or masked: serial numbers, Bluetooth addresses, the names given to Bluetooth devices, the phone&apos;s name and which apps are playing.</source>
+        <translation>Left out or masked: serial numbers, Bluetooth addresses, the names given to Bluetooth devices, the phone&apos;s name and which apps are playing.</translation>
+    </message>
+</context>
+<context>
     <name>OutputsView</name>
     <message>
         <location filename="../qml/pages/OutputsView.qml" line="45"/>
@@ -173,6 +241,7 @@
     <message>
         <location filename="../qml/pages/OutputsView.qml" line="43"/>
         <location filename="../qml/pages/OutputsView.qml" line="60"/>
+        <location filename="../qml/pages/OutputsView.qml" line="73"/>
         <source>Could not set the value.</source>
         <translation>Could not set the value.</translation>
     </message>
@@ -187,93 +256,123 @@
         <translation>Set to %1 %. It holds while the output stays connected.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="105"/>
+        <location filename="../qml/pages/OutputsView.qml" line="71"/>
+        <source>The volume of these headphones is now set in software. They were connected anew for it.</source>
+        <translation>The volume of these headphones is now set in software. They were connected anew for it.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="72"/>
+        <source>Back to the device&apos;s own volume control. The headphones were connected anew for it.</source>
+        <translation>Back to the device&apos;s own volume control. The headphones were connected anew for it.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="126"/>
         <source>Per output</source>
         <translation>Per output</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="107"/>
+        <location filename="../qml/pages/OutputsView.qml" line="128"/>
         <source>Playing on: %1</source>
         <translation>Playing on: %1</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="108"/>
+        <location filename="../qml/pages/OutputsView.qml" line="129"/>
         <source>No output could be identified</source>
         <translation>No output could be identified</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="169"/>
+        <location filename="../qml/pages/OutputsView.qml" line="190"/>
         <source>Waiting: %1 % once this output is in use.</source>
         <translation>Waiting: %1 % once this output is in use.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="190"/>
+        <location filename="../qml/pages/OutputsView.qml" line="211"/>
         <source>On Bluetooth the phone takes over the headphones&apos; own volume control and holds it at full scale, so what you hear is set by the value above. The headphones&apos; own volume further down can be lowered as well — it stays where the phone left it after disconnecting.</source>
         <translation>On Bluetooth the phone takes over the headphones&apos; own volume control and holds it at full scale, so what you hear is set by the value above. The headphones&apos; own volume further down can be lowered as well — it stays where the phone left it after disconnecting.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="194"/>
+        <location filename="../qml/pages/OutputsView.qml" line="215"/>
         <source>The output&apos;s own volume</source>
         <translation>The output&apos;s own volume</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="204"/>
+        <location filename="../qml/pages/OutputsView.qml" line="225"/>
         <source>Beneath the values above, Bluetooth headphones and USB sound cards have a volume of their own, and it starts at full scale. On Bluetooth the figure is sent to the headphones and becomes their own volume; on USB it is the card&apos;s mixer. The system stores none of these: a value holds while the output stays connected, and the next connection may start at full scale again.</source>
         <translation>Beneath the values above, Bluetooth headphones and USB sound cards have a volume of their own, and it starts at full scale. On Bluetooth the figure is sent to the headphones and becomes their own volume; on USB it is the card&apos;s mixer. The system stores none of these: a value holds while the output stays connected, and the next connection may start at full scale again.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="216"/>
+        <location filename="../qml/pages/OutputsView.qml" line="244"/>
         <source>Bluetooth</source>
         <translation>Bluetooth</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="217"/>
+        <location filename="../qml/pages/OutputsView.qml" line="245"/>
         <source>USB</source>
         <translation>USB</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="236"/>
+        <location filename="../qml/pages/OutputsView.qml" line="255"/>
+        <source>These headphones report a volume scale the system cannot use: whatever is set, they stay at full volume. Speaker Gain can have the phone set their volume in software instead. They are connected anew for it, which takes a few seconds.</source>
+        <translation>These headphones report a volume scale the system cannot use: whatever is set, they stay at full volume. Speaker Gain can have the phone set their volume in software instead. They are connected anew for it, which takes a few seconds.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="260"/>
+        <source>Set volume in software</source>
+        <translation>Set volume in software</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="270"/>
+        <source>The volume of these headphones is set in software, because their own volume control reports a scale the system cannot use.</source>
+        <translation>The volume of these headphones is set in software, because their own volume control reports a scale the system cannot use.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="275"/>
+        <source>Use the device&apos;s own control again</source>
+        <translation>Use the device&apos;s own control again</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/OutputsView.qml" line="295"/>
         <source>Fixed volumes of the policy</source>
         <translation>Fixed volumes of the policy</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="247"/>
+        <location filename="../qml/pages/OutputsView.qml" line="306"/>
         <source>not stored yet</source>
         <translation>not stored yet</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="223"/>
+        <location filename="../qml/pages/OutputsView.qml" line="282"/>
         <source>What the headphones themselves decide</source>
         <translation>What the headphones themselves decide</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="94"/>
+        <location filename="../qml/pages/OutputsView.qml" line="115"/>
         <source>About</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="117"/>
+        <location filename="../qml/pages/OutputsView.qml" line="138"/>
         <source>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and applied the moment that output is next in use — a small helper waits for it and then quits.</source>
         <translation>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and applied the moment that output is next in use — a small helper waits for it and then quits.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="170"/>
+        <location filename="../qml/pages/OutputsView.qml" line="191"/>
         <source>Nothing stored yet; this is the figure the system starts this output from.</source>
         <translation>Nothing stored yet; this is the figure the system starts this output from.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="175"/>
+        <location filename="../qml/pages/OutputsView.qml" line="196"/>
         <source>Forget</source>
         <translation>Forget</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="233"/>
+        <location filename="../qml/pages/OutputsView.qml" line="292"/>
         <source>Bluetooth headphones carry settings no audio system can reach, because they live in the headphones and not in the phone: the listening modes — noise cancelling and ambient sound — and the charge of their battery. For Sony models there is a client for Sailfish OS, called Lauscher, that speaks their own protocol and offers exactly those. It is worth knowing about here because ambient sound changes how loud the world around you is, which is half of what people mean by too loud. Setting a volume is not among its functions at the time of writing, so the slider above stays the only way to make the music itself quieter.</source>
         <translation>Bluetooth headphones carry settings no audio system can reach, because they live in the headphones and not in the phone: the listening modes — noise cancelling and ambient sound — and the charge of their battery. For Sony models there is a client for Sailfish OS, called Lauscher, that speaks their own protocol and offers exactly those. It is worth knowing about here because ambient sound changes how loud the world around you is, which is half of what people mean by too loud. Setting a volume is not among its functions at the time of writing, so the slider above stays the only way to make the music itself quieter.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="139"/>
-        <location filename="../qml/pages/OutputsView.qml" line="246"/>
+        <location filename="../qml/pages/OutputsView.qml" line="160"/>
+        <location filename="../qml/pages/OutputsView.qml" line="305"/>
         <source>in use</source>
         <translation>in use</translation>
     </message>
@@ -426,24 +525,34 @@
     </message>
     <message>
         <location filename="../src/speakergain.cpp" line="943"/>
-        <location filename="../src/speakergain.cpp" line="1045"/>
+        <location filename="../src/speakergain.cpp" line="1061"/>
         <source>PulseAudio did not accept the volume.</source>
         <translation>PulseAudio did not accept the volume.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1037"/>
+        <location filename="../src/speakergain.cpp" line="1053"/>
         <source>Set, but the output reports %1 %.</source>
         <translation>Set, but the output reports %1 %.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1043"/>
+        <location filename="../src/speakergain.cpp" line="1059"/>
         <source>The output is gone.</source>
         <translation>The output is gone.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1190"/>
+        <location filename="../src/speakergain.cpp" line="1206"/>
         <source>The value could not be kept.</source>
         <translation>The value could not be kept.</translation>
+    </message>
+    <message>
+        <location filename="../src/softvol.cpp" line="177"/>
+        <source>Not a USB device id: %1</source>
+        <translation>Not a USB device id: %1</translation>
+    </message>
+    <message>
+        <location filename="../src/softvol.cpp" line="189"/>
+        <source>The helper did not run (systemctl: %1).</source>
+        <translation>The helper did not run (systemctl: %1).</translation>
     </message>
 </context>
 <context>

@@ -88,7 +88,9 @@ public:
     // other sound cards PulseAudio drives directly. The phone's own droid
     // sinks are left out - their volume is not the place the platform sets
     // anything. Keys: name, label, kind ("bluetooth" | "usb" | "other"),
-    // percent, running.
+    // percent, running; for USB also usbId ("vvvv:pppp"), scaleBroken (its
+    // volume control claims an impossible dB range), softVolume (PulseAudio
+    // sets its volume in software) and softVolumeSource (see there).
     Q_INVOKABLE QVariantList deviceSinks() const;
 
     // Set one of those outputs' own volume. Not stored by the system: it holds
@@ -115,6 +117,35 @@ public:
 
     // Drop a waiting value.
     Q_INVOKABLE void clearPending(const QString &route, const QString &role);
+
+    // A compact report of how the phone's sound is put together - route,
+    // sinks, streams, the volume controls of external cards - with what looks
+    // wrong spelled out. Serial numbers, Bluetooth addresses and names and the
+    // host name are masked. Lives in diagnostics.cpp.
+    Q_INVOKABLE QString diagnosticReport() const;
+
+    // Write such a report to Documents; returns the path, empty on failure.
+    Q_INVOKABLE QString saveDiagnosticReport(const QString &text) const;
+
+    // Software volume for a USB device whose volume control reports a dB
+    // scale PulseAudio cannot use (softvol.cpp). usbId is "vvvv:pppp". Starts
+    // the root helper through systemd - the polkit rule allows exactly that -
+    // which lists the device and re-enumerates it. Blocks for a few seconds.
+    Q_INVOKABLE bool setSoftVolume(const QString &usbId, bool on);
+
+    // Where a device's software volume comes from: "shipped" (the package
+    // names it), "local" (added on this phone) or empty.
+    static QString softVolumeSource(const QString &usbId);
+
+    // Whether a USB sound card's playback volume claims a dB range no device
+    // has (more than 200 dB), from /proc/asound/cardN/usbmixer. Fills in the
+    // control's name and the claimed span when it does.
+    static bool usbScaleBroken(const QString &card, QString *control = nullptr,
+                               double *spanDb = nullptr);
+
+    // The root side of setSoftVolume: "harbour-speakergain --softvol
+    // add-vvvv-pppp", run by harbour-speakergain-softvol@.service.
+    static int runSoftVolHelper(const QString &instance);
 
     // The helper: "harbour-speakergain --apply-pending". Waits for route
     // changes, applies what is waiting, quits when nothing is left.

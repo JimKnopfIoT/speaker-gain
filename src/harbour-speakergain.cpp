@@ -16,6 +16,8 @@
 #include <QQuickView>
 #include <QScopedPointer>
 
+#include <cstdio>
+
 #include <sailfishapp.h>
 
 #include "speakergain.h"
@@ -27,6 +29,27 @@ int main(int argc, char *argv[])
     for (int i = 1; i < argc; ++i)
         if (qstrcmp(argv[i], "--apply-pending") == 0)
             return SpeakerGain::runApplyHelper(argc, argv);
+
+    // Root side of the software volume for USB devices; run by
+    // harbour-speakergain-softvol@.service, never by hand.
+    for (int i = 1; i + 1 < argc; ++i)
+        if (qstrcmp(argv[i], "--softvol") == 0) {
+            QCoreApplication app(argc, argv);
+            return SpeakerGain::runSoftVolHelper(QString::fromLatin1(argv[i + 1]));
+        }
+
+    // The report of About -> Diagnostics on the terminal, for whoever would
+    // rather run one command than tap through the app.
+    for (int i = 1; i < argc; ++i) {
+        if (qstrcmp(argv[i], "--diagnostics") == 0) {
+            QCoreApplication app(argc, argv);
+            QCoreApplication::setOrganizationName(QStringLiteral("harbour-speakergain"));
+            QCoreApplication::setApplicationName(QStringLiteral("harbour-speakergain"));
+            SpeakerGain gain;
+            fputs(gain.diagnosticReport().toUtf8().constData(), stdout);
+            return 0;
+        }
+    }
 
     // A language for this window only.
     //

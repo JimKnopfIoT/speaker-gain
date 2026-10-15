@@ -967,7 +967,7 @@ QVariantList SpeakerGain::deviceSinks() const
     const QStringList lines = runPactl(QStringList() << QStringLiteral("list")
                                                      << QStringLiteral("sinks"))
                                   .split(QLatin1Char('\n'));
-    QString name, desc, driver, state, bus;
+    QString name, desc, driver, state, bus, flags, card, vendor, product;
     int percent = -1;
     auto flush = [&]() {
         if (name.isEmpty() || percent < 0)
@@ -986,6 +986,13 @@ QVariantList SpeakerGain::deviceSinks() const
         m.insert(QStringLiteral("kind"), kind);
         m.insert(QStringLiteral("percent"), percent);
         m.insert(QStringLiteral("running"), state == QLatin1String("RUNNING"));
+        if (kind == QLatin1String("usb") && !vendor.isEmpty() && !product.isEmpty()) {
+            const QString id = vendor.toLower() + QLatin1Char(':') + product.toLower();
+            m.insert(QStringLiteral("usbId"), id);
+            m.insert(QStringLiteral("scaleBroken"), usbScaleBroken(card));
+            m.insert(QStringLiteral("softVolume"), !flags.contains(QLatin1String("HW_VOLUME_CTRL")));
+            m.insert(QStringLiteral("softVolumeSource"), softVolumeSource(id));
+        }
         out.append(m);
     };
     for (const QString &raw : lines) {
@@ -993,6 +1000,7 @@ QVariantList SpeakerGain::deviceSinks() const
         if (l.startsWith(QStringLiteral("Sink #"))) {
             flush();
             name.clear(); desc.clear(); driver.clear(); state.clear(); bus.clear();
+            flags.clear(); card.clear(); vendor.clear(); product.clear();
             percent = -1;
         } else if (l.startsWith(QStringLiteral("Name:")))
             name = l.mid(5).trimmed();
@@ -1006,6 +1014,14 @@ QVariantList SpeakerGain::deviceSinks() const
             percent = volumePercent(l);
         else if (l.startsWith(QStringLiteral("device.bus ")) || l.startsWith(QStringLiteral("device.bus=")))
             bus = propValue(l);
+        else if (l.startsWith(QStringLiteral("Flags:")))
+            flags = l.mid(6).trimmed();
+        else if (l.startsWith(QStringLiteral("alsa.card ")))
+            card = propValue(l);
+        else if (l.startsWith(QStringLiteral("device.vendor.id ")))
+            vendor = propValue(l);
+        else if (l.startsWith(QStringLiteral("device.product.id ")))
+            product = propValue(l);
     }
     flush();
     return out;
