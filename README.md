@@ -199,6 +199,8 @@ mb2 -t SailfishOS-5.0.0.62-aarch64 build
 per-output part is verified on the Jolla Phone (2026) and the Xperia 10 III; it
 builds and installs for armv7hl but has not been tried on hardware there.
 
+AI assisted development
+
 ## Licence
 
 GPL-3.0-or-later. No warranty — but every change is one number in your own
