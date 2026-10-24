@@ -39,47 +39,77 @@
         <translation>One stored number, in your own settings, through the same interface the system uses itself. No root, nothing patched, no file of the system touched. Set it back to the shipped value and nothing of this app is left behind.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="61"/>
-        <source>One exception, for USB headphones whose volume control reports a scale the system cannot use: the package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Others are added to that list by a small helper with system rights, and only when you ask for it on the outputs page. Removing the app removes all of it.</source>
-        <translation>One exception, for USB headphones whose volume control reports a scale the system cannot use: the package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Others are added to that list by a small helper with system rights, and only when you ask for it on the outputs page. Removing the app removes all of it.</translation>
+        <location filename="../qml/pages/AboutPage.qml" line="57"/>
+        <source>What runs in the background</source>
+        <translation>What runs in the background</translation>
     </message>
     <message>
         <location filename="../qml/pages/AboutPage.qml" line="64"/>
+        <source>Nothing, once the app is closed. The system can store a volume for an output only while that output plays, so a value set for another one is kept by the app. While the app is open — in front or as a cover on the home screen — it listens to the sound system for that output to come into use and then sets the value. It listens only while a value waits. Closed, nothing of it runs; the value waits until the app is next open while that output plays.</source>
+        <translation>Nothing, once the app is closed. The system can store a volume for an output only while that output plays, so a value set for another one is kept by the app. While the app is open — in front or as a cover on the home screen — it listens to the sound system for that output to come into use and then sets the value. It listens only while a value waits. Closed, nothing of it runs; the value waits until the app is next open while that output plays.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="72"/>
+        <source>Versions up to 0.2.1 used a service of the system for this (harbour-speakergain-apply), which kept running until the value was set, also across restarts of the phone. The update ends it, and the app removes what started it.</source>
+        <translation>Versions up to 0.2.1 used a service of the system for this (harbour-speakergain-apply), which kept running until the value was set, also across restarts of the phone. The update ends it, and the app removes what started it.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="75"/>
+        <source>What runs with system rights</source>
+        <translation>What runs with system rights</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="82"/>
+        <source>One helper, for USB headphones whose volume control reports a scale the system cannot use, such as the Bose Noise Cancelling Wired Earbuds: whatever is set, they stay at full volume. The package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Headphones on that list need nothing more, and nothing runs with system rights for them.</source>
+        <translation>One helper, for USB headphones whose volume control reports a scale the system cannot use, such as the Bose Noise Cancelling Wired Earbuds: whatever is set, they stay at full volume. The package brings a sound profile that has the phone set their volume in software, and a list of the headphones known to need it. Headphones on that list need nothing more, and nothing runs with system rights for them.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="89"/>
+        <source>Other headphones with that fault are offered on the outputs page. Only when you switch one on there does the helper run, as the service harbour-speakergain-softvol@, for a few seconds. It does three things and ends: it writes the device&apos;s USB vendor and product id into /etc/udev/rules.d/91-harbour-speakergain-softvol-local.rules, has the system read its device rules again, and disconnects and reconnects that one USB device so the sound system takes it up with the new profile. Switching it off takes the id out again.</source>
+        <translation>Other headphones with that fault are offered on the outputs page. Only when you switch one on there does the helper run, as the service harbour-speakergain-softvol@, for a few seconds. It does three things and ends: it writes the device&apos;s USB vendor and product id into /etc/udev/rules.d/91-harbour-speakergain-softvol-local.rules, has the system read its device rules again, and disconnects and reconnects that one USB device so the sound system takes it up with the new profile. Switching it off takes the id out again.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="97"/>
+        <source>Starting a service of the system would normally ask for the device password. A rule the package brings (polkit) lets your user start exactly this one without it, and only as &quot;add&quot; or &quot;remove&quot; with a four-digit vendor and product id; the helper refuses anything else. It never starts by itself, never stays, and touches nothing but that one file and that one device. Removing the app removes the service, the rule and the list.</source>
+        <translation>Starting a service of the system would normally ask for the device password. A rule the package brings (polkit) lets your user start exactly this one without it, and only as &quot;add&quot; or &quot;remove&quot; with a four-digit vendor and product id; the helper refuses anything else. It never starts by itself, never stays, and touches nothing but that one file and that one device. Removing the app removes the service, the rule and the list.</translation>
+    </message>
+    <message>
+        <location filename="../qml/pages/AboutPage.qml" line="100"/>
         <source>Language</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="73"/>
+        <location filename="../qml/pages/AboutPage.qml" line="109"/>
         <source>Show this app in English</source>
         <translation>Show this app in English</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="74"/>
+        <location filename="../qml/pages/AboutPage.qml" line="110"/>
         <source>Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.</source>
         <translation>Regardless of the language the phone is set to. Takes effect the next time the app is started, and changes nothing outside this app.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="78"/>
+        <location filename="../qml/pages/AboutPage.qml" line="114"/>
         <source>When something does not work</source>
         <translation>When something does not work</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="85"/>
+        <location filename="../qml/pages/AboutPage.qml" line="121"/>
         <source>If a slider moves but the sound does not change, a short report of how this phone&apos;s sound is put together helps to find out why. It holds no serial numbers, addresses or names, and you see all of it before you pass it on.</source>
         <translation>If a slider moves but the sound does not change, a short report of how this phone&apos;s sound is put together helps to find out why. It holds no serial numbers, addresses or names, and you see all of it before you pass it on.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="89"/>
+        <location filename="../qml/pages/AboutPage.qml" line="125"/>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="93"/>
+        <location filename="../qml/pages/AboutPage.qml" line="129"/>
         <source>Licence</source>
         <translation>Licence</translation>
     </message>
     <message>
-        <location filename="../qml/pages/AboutPage.qml" line="101"/>
+        <location filename="../qml/pages/AboutPage.qml" line="137"/>
         <source>GPL-3.0-or-later. No warranty — but the whole change is one number in your own settings, and the button next to the slider puts the shipped value back.</source>
         <translation>GPL-3.0-or-later. No warranty — but the whole change is one number in your own settings, and the button next to the slider puts the shipped value back.</translation>
     </message>
@@ -246,11 +276,6 @@
         <translation>Could not set the value.</translation>
     </message>
     <message>
-        <location filename="../qml/pages/OutputsView.qml" line="46"/>
-        <source>Kept at %1 %. It is applied the next time this output is in use.</source>
-        <translation>Kept at %1 %. It is applied the next time this output is in use.</translation>
-    </message>
-    <message>
         <location filename="../qml/pages/OutputsView.qml" line="59"/>
         <source>Set to %1 %. It holds while the output stays connected.</source>
         <translation>Set to %1 %. It holds while the output stays connected.</translation>
@@ -281,9 +306,14 @@
         <translation>No output could be identified</translation>
     </message>
     <message>
+        <location filename="../qml/pages/OutputsView.qml" line="138"/>
+        <source>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and set once that output is in use while the app is open, in front or as a cover. Nothing of it runs once the app is closed.</source>
+        <translation>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and set once that output is in use while the app is open, in front or as a cover. Nothing of it runs once the app is closed.</translation>
+    </message>
+    <message>
         <location filename="../qml/pages/OutputsView.qml" line="190"/>
-        <source>Waiting: %1 % once this output is in use.</source>
-        <translation>Waiting: %1 % once this output is in use.</translation>
+        <source>Waiting: %1 % once this output is in use while the app is open.</source>
+        <translation>Waiting: %1 % once this output is in use while the app is open.</translation>
     </message>
     <message>
         <location filename="../qml/pages/OutputsView.qml" line="211"/>
@@ -346,14 +376,14 @@
         <translation>What the headphones themselves decide</translation>
     </message>
     <message>
+        <location filename="../qml/pages/OutputsView.qml" line="46"/>
+        <source>Kept at %1 %. It is set once this output is in use while the app is open.</source>
+        <translation>Kept at %1 %. It is set once this output is in use while the app is open.</translation>
+    </message>
+    <message>
         <location filename="../qml/pages/OutputsView.qml" line="115"/>
         <source>About</source>
         <translation>About</translation>
-    </message>
-    <message>
-        <location filename="../qml/pages/OutputsView.qml" line="138"/>
-        <source>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and applied the moment that output is next in use — a small helper waits for it and then quits.</source>
-        <translation>Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and applied the moment that output is next in use — a small helper waits for it and then quits.</translation>
     </message>
     <message>
         <location filename="../qml/pages/OutputsView.qml" line="191"/>
@@ -380,167 +410,167 @@
 <context>
     <name>SpeakerGain</name>
     <message>
-        <location filename="../src/speakergain.cpp" line="153"/>
-        <location filename="../src/speakergain.cpp" line="184"/>
+        <location filename="../src/speakergain.cpp" line="155"/>
+        <location filename="../src/speakergain.cpp" line="186"/>
         <source>profiled is not answering on the session bus.</source>
         <translation>profiled is not answering on the session bus.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="162"/>
+        <location filename="../src/speakergain.cpp" line="164"/>
         <source>profiled refused the value.</source>
         <translation>profiled refused the value.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="207"/>
+        <location filename="../src/speakergain.cpp" line="209"/>
         <source>Written, but reading it back gave a different value.</source>
         <translation>Written, but reading it back gave a different value.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="260"/>
+        <location filename="../src/speakergain.cpp" line="262"/>
         <source>Survives updates</source>
         <translation>Survives updates</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="262"/>
+        <location filename="../src/speakergain.cpp" line="264"/>
         <source>The value is in your home directory and belongs to no package. A restart keeps it, and so does a system update.</source>
         <translation>The value is in your home directory and belongs to no package. A restart keeps it, and so does a system update.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="272"/>
+        <location filename="../src/speakergain.cpp" line="274"/>
         <source>No package owns this file</source>
         <translation>No package owns this file</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="274"/>
+        <location filename="../src/speakergain.cpp" line="276"/>
         <source>Nothing in the package database claims this path, so no update is going to replace it. Whoever put it there is not the package manager.</source>
         <translation>Nothing in the package database claims this path, so no update is going to replace it. Whoever put it there is not the package manager.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="289"/>
+        <location filename="../src/speakergain.cpp" line="291"/>
         <source>Kept as configuration</source>
         <translation>Kept as configuration</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="291"/>
+        <location filename="../src/speakergain.cpp" line="293"/>
         <source>The file belongs to %1 and is marked as configuration. An update keeps your edit and puts its own version next to it.</source>
         <translation>The file belongs to %1 and is marked as configuration. An update keeps your edit and puts its own version next to it.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="295"/>
+        <location filename="../src/speakergain.cpp" line="297"/>
         <source>An update throws this away</source>
         <translation>An update throws this away</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="297"/>
+        <location filename="../src/speakergain.cpp" line="299"/>
         <source>The file belongs to %1 and is not marked as configuration. The next update of that package overwrites it — no backup copy, no notice.</source>
         <translation>The file belongs to %1 and is not marked as configuration. The next update of that package overwrites it — no backup copy, no notice.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="488"/>
+        <location filename="../src/speakergain.cpp" line="490"/>
         <source>Media</source>
         <translation>Media</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="490"/>
+        <location filename="../src/speakergain.cpp" line="492"/>
         <source>Calls</source>
         <translation>Calls</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="492"/>
+        <location filename="../src/speakergain.cpp" line="494"/>
         <source>VoIP</source>
         <translation>VoIP</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="499"/>
+        <location filename="../src/speakergain.cpp" line="501"/>
         <source>Speaker</source>
         <translation>Speaker</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="501"/>
+        <location filename="../src/speakergain.cpp" line="503"/>
         <source>Wired headphones</source>
         <translation>Wired headphones</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="503"/>
-        <location filename="../src/speakergain.cpp" line="522"/>
+        <location filename="../src/speakergain.cpp" line="505"/>
+        <location filename="../src/speakergain.cpp" line="524"/>
         <source>Wired headset</source>
         <translation>Wired headset</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="505"/>
+        <location filename="../src/speakergain.cpp" line="507"/>
         <source>Bluetooth, music</source>
         <translation>Bluetooth, music</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="507"/>
+        <location filename="../src/speakergain.cpp" line="509"/>
         <source>Bluetooth, calls (HFP)</source>
         <translation>Bluetooth, calls (HFP)</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="509"/>
+        <location filename="../src/speakergain.cpp" line="511"/>
         <source>Bluetooth, calls (HSP)</source>
         <translation>Bluetooth, calls (HSP)</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="511"/>
+        <location filename="../src/speakergain.cpp" line="513"/>
         <source>Bluetooth, calls</source>
         <translation>Bluetooth, calls</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="513"/>
-        <location filename="../src/speakergain.cpp" line="524"/>
+        <location filename="../src/speakergain.cpp" line="515"/>
+        <location filename="../src/speakergain.cpp" line="526"/>
         <source>Line out</source>
         <translation>Line out</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="515"/>
+        <location filename="../src/speakergain.cpp" line="517"/>
         <source>USB audio</source>
         <translation>USB audio</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="527"/>
+        <location filename="../src/speakergain.cpp" line="529"/>
         <source>Speaker and %1</source>
         <translation>Speaker and %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="856"/>
+        <location filename="../src/speakergain.cpp" line="858"/>
         <source>PulseAudio could not be reached.</source>
         <translation>PulseAudio could not be reached.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="872"/>
+        <location filename="../src/speakergain.cpp" line="874"/>
         <source>PulseAudio refused the connection: %1</source>
         <translation>PulseAudio refused the connection: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="884"/>
+        <location filename="../src/speakergain.cpp" line="886"/>
         <source>PulseAudio dropped the connection: %1</source>
         <translation>PulseAudio dropped the connection: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="907"/>
-        <location filename="../src/speakergain.cpp" line="918"/>
+        <location filename="../src/speakergain.cpp" line="909"/>
+        <location filename="../src/speakergain.cpp" line="920"/>
         <source>The stream could not be opened: %1</source>
         <translation>The stream could not be opened: %1</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="943"/>
-        <location filename="../src/speakergain.cpp" line="1061"/>
+        <location filename="../src/speakergain.cpp" line="945"/>
+        <location filename="../src/speakergain.cpp" line="1063"/>
         <source>PulseAudio did not accept the volume.</source>
         <translation>PulseAudio did not accept the volume.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1053"/>
+        <location filename="../src/speakergain.cpp" line="1055"/>
         <source>Set, but the output reports %1 %.</source>
         <translation>Set, but the output reports %1 %.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1059"/>
+        <location filename="../src/speakergain.cpp" line="1061"/>
         <source>The output is gone.</source>
         <translation>The output is gone.</translation>
     </message>
     <message>
-        <location filename="../src/speakergain.cpp" line="1206"/>
+        <location filename="../src/speakergain.cpp" line="1227"/>
         <source>The value could not be kept.</source>
         <translation>The value could not be kept.</translation>
     </message>

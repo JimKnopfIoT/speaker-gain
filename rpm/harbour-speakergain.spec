@@ -3,7 +3,7 @@
 # Neutral packaging metadata — no personal identifiers.
 Name:       harbour-speakergain
 Summary:    Set the alarm volume the system hides
-Version:    0.2.1
+Version:    0.2.2
 Release:    1
 # Neutral build host so built RPMs carry no real hostname/domain.
 %define _buildhost reproducible-builder
@@ -61,6 +61,11 @@ desktop-file-install --delete-original \
 %post
 # The rule naming the USB devices that get software volume.
 udevadm control --reload >/dev/null 2>&1 || :
+# Up to 0.2.1 a user unit waited for idle outputs, enabled for as long as a
+# value waited. The app does that itself now, only while it runs: end a copy
+# left running by the old version. The app takes the unit's link out of the
+# session the next time it starts.
+pkill -f '^/usr/bin/%{name} --apply-pending$' >/dev/null 2>&1 || :
 systemctl daemon-reload >/dev/null 2>&1 || :
 
 %postun
@@ -77,7 +82,6 @@ systemctl daemon-reload >/dev/null 2>&1 || :
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
-%{_prefix}/lib/systemd/user/%{name}-apply.service
 %{_prefix}/lib/systemd/system/%{name}-softvol@.service
 /lib/udev/rules.d/91-%{name}-softvol.rules
 %{_datadir}/pulseaudio/alsa-mixer/profile-sets/%{name}-softvol.conf
@@ -86,6 +90,16 @@ systemctl daemon-reload >/dev/null 2>&1 || :
 %{_datadir}/polkit-1/rules.d/50-%{name}.rules
 
 %changelog
+* Sat Oct 24 2026 harbour-speakergain contributors 0.2.2-1
+- No background service any more. A volume for an output not in use waits in
+  the app's settings and is set when that output comes into use while the app
+  is open, in front or as a cover; the app listens to PulseAudio only while a
+  value waits, and not at all once it is closed. 0.2.1 and earlier used a
+  systemd user unit for this that stayed enabled, through restarts, until the
+  value was set; the update ends it and the app removes its link.
+- About explains what runs in the background (nothing, once the app is
+  closed) and what runs with system rights, and why: the helper that adds USB
+  headphones to the software volume list, what it writes and when it runs.
 * Thu Oct 15 2026 harbour-speakergain contributors 0.2.1-1
 - USB headphones whose volume control reports a dB scale the system cannot
   use now follow the volume. The Bose Noise Cancelling Wired Earbuds claim

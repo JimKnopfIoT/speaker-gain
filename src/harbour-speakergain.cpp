@@ -24,11 +24,12 @@
 
 int main(int argc, char *argv[])
 {
-    // The helper that applies a waiting volume once its output comes into use
-    // (see SpeakerGain::setRouteVolume). No window, no QML.
+    // What the user unit of 0.2.1 and earlier ran. The app does that itself
+    // now, while it runs; should anything still call it, it ends at once
+    // instead of opening a window.
     for (int i = 1; i < argc; ++i)
         if (qstrcmp(argv[i], "--apply-pending") == 0)
-            return SpeakerGain::runApplyHelper(argc, argv);
+            return 0;
 
     // Root side of the software volume for USB devices; run by
     // harbour-speakergain-softvol@.service, never by hand.
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
 
     SpeakerGain gain;
     view->rootContext()->setContextProperty(QStringLiteral("speakergain"), &gain);
+    gain.watchPending();
 
     view->setSource(SailfishApp::pathToMainQml());
     view->show();

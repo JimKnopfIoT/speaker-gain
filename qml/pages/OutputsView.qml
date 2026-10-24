@@ -3,8 +3,8 @@ import Sailfish.Silica 1.0
 
 // The volume PulseAudio keeps per role and per output route, for every route
 // the system knows. The route in use takes a value at once; PulseAudio files
-// no other, so for those the value waits and a helper applies it when the
-// route next comes into use.
+// no other, so for those the value waits and the app applies it when the
+// route comes into use while it runs (SpeakerGain::watchPending).
 // Right of the alarm in the carousel.
 Item {
     id: page
@@ -43,7 +43,7 @@ Item {
             ? (speakergain.lastError.length > 0 ? speakergain.lastError : qsTr("Could not set the value."))
             : current
               ? qsTr("Set to %1 %. The database behind it is written a few seconds later.").arg(v)
-              : qsTr("Kept at %1 %. It is applied the next time this output is in use.").arg(v)
+              : qsTr("Kept at %1 %. It is set once this output is in use while the app is open.").arg(v)
         page.routeList = speakergain.allRoutes()
     }
 
@@ -97,7 +97,7 @@ Item {
         repeat: true
         running: page.current && Qt.application.active
         onTriggered: {
-            // Also while a value waits for the route in use: the helper
+            // Also while a value waits for the route in use: the app
             // applies it a moment after the switch, and the page should show
             // it landing.
             var now = speakergain.activeRoute()
@@ -135,7 +135,7 @@ Item {
                 wrapMode: Text.Wrap
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.secondaryColor
-                text: qsTr("Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and applied the moment that output is next in use — a small helper waits for it and then quits.")
+                text: qsTr("Every output carries a volume of its own, per kind of sound, and the system restores it when the output changes. The output in use takes a new value at once. The system files no other, so for those the value is kept here and set once that output is in use while the app is open, in front or as a cover. Nothing of it runs once the app is closed.")
             }
 
             Label {
@@ -187,7 +187,7 @@ Item {
                                                               : Theme.secondaryColor
                                 visible: modelData.pending >= 0 || modelData.stored === false
                                 text: modelData.pending >= 0
-                                      ? qsTr("Waiting: %1 % once this output is in use.").arg(modelData.pending)
+                                      ? qsTr("Waiting: %1 % once this output is in use while the app is open.").arg(modelData.pending)
                                       : qsTr("Nothing stored yet; this is the figure the system starts this output from.")
                             }
                             Button {

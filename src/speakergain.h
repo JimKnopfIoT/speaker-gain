@@ -18,6 +18,9 @@
 #include <QVariantList>
 #include <QVariantMap>
 
+class QProcess;
+class QTimer;
+
 class SpeakerGain : public QObject
 {
     Q_OBJECT
@@ -111,8 +114,9 @@ public:
     // Set a role's volume on any route. The route in use takes it at once.
     // Any other route cannot be written while it is not in use - PulseAudio
     // keeps that database in memory and only ever files the current route -
-    // so the value waits, and a small helper applies it the moment the route
-    // comes into use and then quits. Returns false only on a real failure.
+    // so the value waits, and the app applies it the moment the route comes
+    // into use while it runs (watchPending). Returns false only on a real
+    // failure.
     Q_INVOKABLE bool setRouteVolume(const QString &route, const QString &role, int percent);
 
     // Drop a waiting value.
@@ -147,9 +151,12 @@ public:
     // add-vvvv-pppp", run by harbour-speakergain-softvol@.service.
     static int runSoftVolHelper(const QString &instance);
 
-    // The helper: "harbour-speakergain --apply-pending". Waits for route
-    // changes, applies what is waiting, quits when nothing is left.
-    static int runApplyHelper(int argc, char *argv[]);
+    // Apply waiting values while the app runs - in front or as a cover: as
+    // long as one waits, listen to PulseAudio for route changes, and stop
+    // listening when none is left. Nothing of it outlives the app; a value
+    // still waiting when it closes waits for the next start. Called once, by
+    // the app's own instance only.
+    void watchPending();
 
 signals:
     void changed();
@@ -157,12 +164,16 @@ signals:
 private:
     QString profiledGet(const QString &profile, const QString &key) const;
     bool profiledSet(const QString &profile, const QString &key, const QString &value);
+    void updateWatch();
+    void applyPending();
 
     bool m_available = false;
     int m_alarm = -1;
     int m_ring = -1;
     QString m_profile;
     QString m_error;
+    QProcess *m_sub = nullptr;      // "pactl subscribe", while a value waits
+    QTimer *m_debounce = nullptr;
 };
 
 #endif // SPEAKERGAIN_H

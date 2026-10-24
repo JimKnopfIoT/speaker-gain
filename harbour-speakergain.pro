@@ -14,7 +14,7 @@ QT += core qml quick dbus
 CONFIG += link_pkgconfig
 PKGCONFIG += sailfishapp libpulse
 
-isEmpty(VERSION): VERSION = 0.2.1
+isEmpty(VERSION): VERSION = 0.2.2
 isEmpty(RELEASE): RELEASE = 1
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 DEFINES += APP_RELEASE=\\\"$$RELEASE\\\"
@@ -27,11 +27,6 @@ SOURCES += \
     src/speakergain.cpp \
     src/diagnostics.cpp \
     src/softvol.cpp
-
-# The helper that applies a volume for an output once it comes into use.
-systemd.files = systemd/harbour-speakergain-apply.service
-systemd.path = /usr/lib/systemd/user
-INSTALLS += systemd
 
 # Software volume for USB headphones whose volume scale PulseAudio cannot use
 # (src/softvol.cpp): the profile set and its paths, the rule naming the
@@ -71,7 +66,6 @@ DISTFILES += \
     qml/pages/AboutPage.qml \
     qml/pages/DiagnosticsPage.qml \
     rpm/harbour-speakergain.spec \
-    systemd/harbour-speakergain-apply.service \
     systemd/harbour-speakergain-softvol@.service \
     pulse/* \
     polkit/50-harbour-speakergain.rules \

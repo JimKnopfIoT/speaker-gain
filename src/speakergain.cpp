@@ -18,11 +18,13 @@
 #include <QSet>
 #include <QThread>
 #include <QTimer>
-#include <QCoreApplication>
 #include <algorithm>
 #include <QtMath>
 
 #include <pulse/pulseaudio.h>
+
+#include <signal.h>
+#include <sys/prctl.h>
 
 namespace {
 
@@ -1072,12 +1074,31 @@ bool SpeakerGain::setSinkVolume(const QString &sink, int percent)
 // database it holds in memory. Editing the file underneath it is pointless:
 // the next save writes the memory back over it. So a value for a route that is
 // not in use is kept here and applied, through the same stream, the moment
-// that route is - by a helper that waits for it and leaves again.
+// that route is - by the app itself, while it runs. Nothing is left behind to
+// wait once it is closed: the value waits for the next start instead.
 // ---------------------------------------------------------------------------
 namespace {
 
 const char *kModesDir = "/var/lib/nemo-pulseaudio-parameters/modes";
-const char *kHelperUnit = "harbour-speakergain-apply.service";
+// Up to 0.2.1 a systemd user unit did the waiting, enabled for as long as a
+// value waited, through restarts of the phone. Gone since; see watchPending().
+const char *kOldHelperUnit = "harbour-speakergain-apply.service";
+
+// The listener dies with the app however the app ends - closed, killed or
+// crashed. A clean exit kills it in QProcess's destructor; anything else
+// would leave it running without anyone to read it, so the kernel is told to
+// end it together with its parent.
+class ChildProcess : public QProcess
+{
+public:
+    using QProcess::QProcess;
+
+protected:
+    void setupChildProcess() override
+    {
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+    }
+};
 
 QString pendingKey(const QString &route, const QString &role)
 {
@@ -1208,10 +1229,7 @@ bool SpeakerGain::setRouteVolume(const QString &route, const QString &role, int 
             return false;
         }
     }
-    // Enabled so it survives a restart of the phone, started so it is
-    // listening now. It disables itself once nothing is left to do.
-    systemctlUser(QStringList() << QStringLiteral("enable") << QStringLiteral("--now")
-                                << QLatin1String(kHelperUnit));
+    updateWatch();
     emit changed();
     return true;
 }
@@ -1221,101 +1239,98 @@ void SpeakerGain::clearPending(const QString &route, const QString &role)
     QSettings s;
     s.remove(pendingKey(route, role));
     s.sync();
+    updateWatch();
     emit changed();
 }
 
-namespace {
-
-// Listens to PulseAudio's own event stream instead of asking on a timer:
-// a route change rewrites the policy module's properties, and that is posted
-// as a change on the module.
-class ApplyHelper : public QObject
+// Listens to PulseAudio's own event stream instead of asking on a timer: a
+// route change rewrites the policy module's properties, and that is posted as
+// a change on the module. Only while a value waits, and only in this process -
+// the listener is a child of the app and goes when the app does.
+void SpeakerGain::watchPending()
 {
-public:
-    ApplyHelper()
-    {
-        m_debounce.setSingleShot(true);
-        m_debounce.setInterval(600);
-        QObject::connect(&m_debounce, &QTimer::timeout, [this]() { check(); });
-        QObject::connect(&m_sub, &QProcess::readyReadStandardOutput, [this]() {
-            m_sub.readAllStandardOutput();
-            m_debounce.start();
-        });
-        // PulseAudio restarted, or pactl died: listen again a moment later.
-        QObject::connect(&m_sub, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-                         [this](int, QProcess::ExitStatus) {
-            QTimer::singleShot(3000, [this]() { listen(); });
-        });
+    if (m_sub)
+        return;
+
+    // Take the unit of 0.2.1 and earlier out of the session: the link that
+    // started it with every boot, and the copy still running from before the
+    // update. The link dangles once the package has removed the unit file,
+    // which is why it is looked at as a link and not as a file.
+    const QString link = QDir::homePath()
+        + QStringLiteral("/.config/systemd/user/post-user-session.target.wants/")
+        + QLatin1String(kOldHelperUnit);
+    if (QFileInfo(link).isSymLink()) {
+        QFile::remove(link);
+        systemctlUser(QStringList() << QStringLiteral("stop") << QLatin1String(kOldHelperUnit));
+        systemctlUser(QStringList() << QStringLiteral("daemon-reload"));
+        qInfo("speakergain: removed %s", kOldHelperUnit);
     }
 
-    void start()
-    {
-        listen();
-        check();
-    }
+    m_debounce = new QTimer(this);
+    m_debounce->setSingleShot(true);
+    m_debounce->setInterval(600);
+    connect(m_debounce, &QTimer::timeout, this, &SpeakerGain::applyPending);
 
-private:
-    void listen()
-    {
-        useCLocale(m_sub);
-        m_sub.start(QStringLiteral("pactl"), QStringList() << QStringLiteral("subscribe"));
-    }
+    m_sub = new ChildProcess(this);
+    connect(m_sub, &QProcess::readyReadStandardOutput, this, [this]() {
+        m_sub->readAllStandardOutput();
+        m_debounce->start();
+    });
+    // PulseAudio restarted, or pactl died: listen again a moment later, if
+    // there is still a reason to.
+    connect(m_sub, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+            this, [this](int, QProcess::ExitStatus) {
+        QTimer::singleShot(3000, this, [this]() { updateWatch(); });
+    });
+    updateWatch();
+}
 
-    void check()
-    {
-        const QString route = policyRoute();
-        if (!route.isEmpty()) {
-            QSettings s;
-            s.sync();               // the page writes this file, not us
-            s.beginGroup(QStringLiteral("pending/") + route);
-            const QStringList roles = s.childKeys();
-            s.endGroup();
-            for (const QString &role : roles) {
-                bool ok = false;
-                const int v = s.value(pendingKey(route, role)).toInt(&ok);
-                SpeakerGain g;
-                if (!ok || g.setRoleVolume(role, v)) {
-                    s.remove(pendingKey(route, role));
-                    qInfo("speakergain: applied %s on %s: %d %%",
-                          qPrintable(role), qPrintable(route), v);
-                } else {
-                    qWarning("speakergain: %s on %s failed: %s", qPrintable(role),
-                             qPrintable(route), qPrintable(g.lastError()));
-                }
-            }
-            s.sync();
-        }
-        if (!anyPending()) {
-            systemctlUser(QStringList() << QStringLiteral("disable") << QLatin1String(kHelperUnit));
-            // The page may have kept a new value between the look above and
-            // the disable - it found the unit running and left it be. Then
-            // stay, and stay enabled.
-            if (anyPending()) {
-                systemctlUser(QStringList() << QStringLiteral("enable") << QLatin1String(kHelperUnit));
-                return;
-            }
-            qInfo("speakergain: nothing left to apply");
-            m_sub.disconnect();
-            m_sub.kill();
-            m_sub.waitForFinished(1000);
-            QCoreApplication::quit();
-        }
-    }
-
-    QProcess m_sub;
-    QTimer m_debounce;
-};
-
-} // namespace
-
-int SpeakerGain::runApplyHelper(int argc, char *argv[])
+void SpeakerGain::updateWatch()
 {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setOrganizationName(QStringLiteral("harbour-speakergain"));
-    QCoreApplication::setApplicationName(QStringLiteral("harbour-speakergain"));
-    ApplyHelper helper;
-    QTimer::singleShot(0, [&helper]() { helper.start(); });
-    return app.exec();
+    if (!m_sub)
+        return;
+    const bool waiting = anyPending();
+    const bool listening = m_sub->state() != QProcess::NotRunning;
+    if (waiting && !listening) {
+        useCLocale(*m_sub);
+        m_sub->start(QStringLiteral("pactl"), QStringList() << QStringLiteral("subscribe"));
+        // The route in use may be the one already.
+        m_debounce->start();
+    } else if (!waiting && listening) {
+        m_sub->kill();
+        m_sub->waitForFinished(1000);
+    }
+}
+
+void SpeakerGain::applyPending()
+{
+    const QString route = policyRoute();
+    bool applied = false;
+    if (!route.isEmpty()) {
+        QSettings s;
+        s.beginGroup(QStringLiteral("pending/") + route);
+        const QStringList roles = s.childKeys();
+        s.endGroup();
+        for (const QString &role : roles) {
+            bool ok = false;
+            const int v = s.value(pendingKey(route, role)).toInt(&ok);
+            // An instance of its own, so the page's last error stays its own.
+            SpeakerGain g;
+            if (!ok || g.setRoleVolume(role, v)) {
+                s.remove(pendingKey(route, role));
+                applied = true;
+                qInfo("speakergain: applied %s on %s: %d %%",
+                      qPrintable(role), qPrintable(route), v);
+            } else {
+                qWarning("speakergain: %s on %s failed: %s", qPrintable(role),
+                         qPrintable(route), qPrintable(g.lastError()));
+            }
+        }
+        s.sync();
+    }
+    updateWatch();
+    if (applied)
+        emit changed();
 }
 
 bool SpeakerGain::forceEnglish() const

@@ -4,7 +4,7 @@
 
 **The alarm rings at full volume and nothing quietens it. Bluetooth headphones
 start louder than they should. Neither has a control anywhere.** This sets both,
-without root, and says for every value whether a system update will keep it.
+without root for either, and says for every value whether a system update will keep it.
 
 <br clear="left">
 
@@ -50,11 +50,12 @@ alerts use. The output **in use** takes a value at once. Any other cannot be
 written while it is idle: the stream-restore module keeps that database in
 memory and files a value only under the route in use, so editing the file
 underneath it is undone by its next save. A value for an idle output is
-therefore kept by the app, and a small helper
-(`harbour-speakergain-apply.service`, a systemd user unit) waits on
-PulseAudio's event stream for that output to come into use, applies the value
-the same way and quits. It is enabled only while a value is waiting and
-disables itself afterwards.
+therefore kept by the app. While the app is open — in front or as a cover —
+it waits on PulseAudio's event stream for that output to come into use and
+applies the value the same way. It listens only while a value waits, and
+nothing of it runs once the app is closed: the value then waits for the next
+start. (Up to 0.2.1 a systemd user unit did this and stayed enabled, through
+restarts, until the value was set; 0.2.2 removes it.)
 
 Which output is in use comes from the audio policy's own last routing decision
 (`policy.sink_route.mode` on `module-policy-enforcement`), not from the sinks:
@@ -174,6 +175,35 @@ files it under the output in use — the same move
 [Mic Gain](https://github.com/JimKnopfIoT/harbour-micgain) makes for recording,
 mirrored to playback. No sample is ever played through that stream, so nothing
 is heard.
+
+### What runs in the background, and what runs as root
+
+**In the background: nothing, once the app is closed.** A value for an output
+not in use waits in the app's settings. While the app is open, in front or as a
+cover, it runs `pactl subscribe` as its own child process for as long as a value
+waits, and sets the value when that output comes into use. Versions up to 0.2.1
+used the systemd user unit `harbour-speakergain-apply.service` for this, which
+stayed enabled, through restarts, until the value was set. The 0.2.2 update
+ends it, and the app removes its link from
+`~/.config/systemd/user/post-user-session.target.wants/` on its next start.
+
+**As root: one oneshot helper, and only on request.** It exists for USB
+headphones whose volume control reports a dB scale PulseAudio cannot use
+(below). Devices on the shipped list in
+`/lib/udev/rules.d/91-harbour-speakergain-softvol.rules` never need it. For any
+other, switching on software volume on the outputs page starts
+`harbour-speakergain-softvol@add-VVVV-PPPP.service` (or `remove-…`). It:
+
+1. writes the vendor and product id into
+   `/etc/udev/rules.d/91-harbour-speakergain-softvol-local.rules`,
+2. runs `udevadm control --reload`,
+3. writes 0 and then 1 to that USB device's `authorized` in sysfs, so it is
+   enumerated anew with the profile set,
+
+and exits. The polkit rule `50-harbour-speakergain.rules` lets `defaultuser` start
+exactly that unit, with exactly that instance pattern, and nothing else; the
+helper checks the pattern again itself. Uninstalling removes the unit, the
+polkit rule and the local rules file.
 
 ## Installing
 
